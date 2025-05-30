@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-lang-key="pageTitle">Mindful Journey - Guided Mindfulness & Wellness App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <nav>
+                <div class="logo" data-lang-key="logoText">Mindful Journey</div>
+                <ul class="nav-links">
+                    <li><button id="daily-affirmation-button" class="nav-button" data-lang-key="navDailyAffirmation">Daily Affirmation</button></li>
+                    <li><a href="#home" class="active" data-lang-key="navHome">Home</a></li>
+                    <li><a href="#practices" data-lang-key="navPractices">Practices</a></li>
+                    <li><a href="#student-zone" data-lang-key="navStudentZone">Student Zone</a></li>
+                    <li><a href="#about" data-lang-key="navAbout">About</a></li>
+                </ul>
+                <button id="lang-switcher" class="lang-button">JA</button>
+            </nav>
+        </header>
+
+        <main>
+            <section id="home" class="hero">
+                <h1 data-lang-key="heroTitle">Welcome to Mindful Journey</h1>
+                <p data-lang-key="heroSubtitle">Your personal guide to mindfulness and wellness</p>
+                <button onclick="startPractice()" class="cta-button" data-lang-key="heroButton">Start Your Practice</button>
+            </section>
+
+            <section id="practices" class="practices-section">
+                <h2 data-lang-key="practicesTitle">Guided Practices</h2>
+                <div class="practice-grid">
+                    <div class="practice-card" onclick="startPractice('breathing')">
+                        <i class="fas fa-lungs"></i>
+                        <h3 data-lang-key="practiceBreathingTitle">Focus on Breathing</h3>
+                        <p data-lang-key="practiceBreathingDesc">Learn to focus your attention on your breath</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('body-scan')">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <h3 data-lang-key="practiceBodyScanTitle">Body Scan</h3>
+                        <p data-lang-key="practiceBodyScanDesc">Explore awareness of your body sensations</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('mindful-movement')">
+                        <i class="fas fa-running"></i>
+                        <h3 data-lang-key="practiceMindfulMovementTitle">Mindful Movement</h3>
+                        <p data-lang-key="practiceMindfulMovementDesc">Connect your body and mind through movement</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('loving-kindness')">
+                        <i class="fas fa-heart"></i>
+                        <h3 data-lang-key="practiceLovingKindnessTitle">Loving Kindness</h3>
+                        <p data-lang-key="practiceLovingKindnessDesc">Cultivate kindness and compassion</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('mindful-walking')">
+                        <i class="fas fa-walking"></i>
+                        <h3 data-lang-key="practiceMindfulWalkingTitle">Mindful Walking</h3>
+                        <p data-lang-key="practiceMindfulWalkingDesc">Practice awareness while walking</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('mindful-eating')">
+                        <i class="fas fa-apple-alt"></i>
+                        <h3 data-lang-key="practiceMindfulEatingTitle">Mindful Eating</h3>
+                        <p data-lang-key="practiceMindfulEatingDesc">Bring awareness to the experience of eating</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('breathing-space')">
+                        <i class="fas fa-hourglass-half"></i>
+                        <h3 data-lang-key="practiceBreathingSpaceTitle">Three Minute Breathing Space</h3>
+                        <p data-lang-key="practiceBreathingSpaceDesc">A short practice to reconnect</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('sounds-thoughts')">
+                        <i class="fas fa-assistive-listening-systems"></i>
+                        <h3 data-lang-key="practiceSoundsThoughtsTitle">Sounds & Thoughts</h3>
+                        <p data-lang-key="practiceSoundsThoughtsDesc">Observe sounds and thoughts without judgment</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('mindful-seeing')">
+                        <i class="fas fa-eye"></i>
+                        <h3 data-lang-key="practiceMindfulSeeingTitle">Mindful Seeing</h3>
+                        <p data-lang-key="practiceMindfulSeeingDesc">Observe your surroundings with fresh eyes</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('gratitude-meditation')">
+                        <i class="fas fa-hand-holding-heart"></i>
+                        <h3 data-lang-key="practiceGratitudeMeditationTitle">Gratitude Meditation</h3>
+                        <p data-lang-key="practiceGratitudeMeditationDesc">Focus on and appreciate things you're grateful for</p>
+                    </div>
+                    <div class="practice-card" onclick="startPractice('mindful-listening-music')">
+                        <i class="fas fa-music"></i>
+                        <h3 data-lang-key="practiceMindfulListeningMusicTitle">Mindful Listening to Music</h3>
+                        <p data-lang-key="practiceMindfulListeningMusicDesc">Deeply listen to a piece of music</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="student-zone" class="student-zone">
+                <h2 data-lang-key="studentZoneTitle">Student Zone</h2>
+                <div class="activity-grid">
+                    <div class="activity-card" onclick="openActivity('gratitudeJournal')">
+                        <i class="fas fa-pen-fancy"></i>
+                        <h3 data-lang-key="activityGratitudeTitle">Gratitude Journal</h3>
+                        <p data-lang-key="activityGratitudeDesc">Write down three things you're grateful for each day</p>
+                        <button onclick="openActivity('gratitudeJournal')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                    <div class="activity-card" onclick="openActivity('mindfulDrawing')">
+                        <i class="fas fa-paint-brush"></i>
+                        <h3 data-lang-key="activityDrawingTitle">Mindful Drawing</h3>
+                        <p data-lang-key="activityDrawingDesc">Create art while focusing on the present moment</p>
+                        <button onclick="openActivity('mindfulDrawing')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                    <div class="activity-card" onclick="openActivity('mindfulListening')">
+                        <i class="fas fa-headphones-alt"></i>
+                        <h3 data-lang-key="activityListeningTitle">Mindful Listening</h3>
+                        <p data-lang-key="activityListeningDesc">Practice active listening with different sounds</p>
+                        <button onclick="openActivity('mindfulListening')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                    <div class="activity-card" onclick="openActivity('emotionCheckIn')">
+                        <i class="fas fa-brain"></i>
+                        <h3 data-lang-key="activityEmotionTitle">Emotion Check-In</h3>
+                        <p data-lang-key="activityEmotionDesc">Explore and understand your emotions</p>
+                        <button onclick="openActivity('emotionCheckIn')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                    <div class="activity-card">
+                        <i class="fas fa-palette"></i>
+                        <h3 data-lang-key="activityColoringTitle">Mindful Coloring</h3>
+                        <p data-lang-key="activityColoringDesc">Engage your senses with creative coloring</p>
+                        <button onclick="openActivity('mindfulColoring')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                    <div class="activity-card">
+                        <i class="fas fa-comment-dots"></i>
+                        <h3 data-lang-key="activityAffirmationsTitle">Positive Affirmations</h3>
+                        <p data-lang-key="activityAffirmationsDesc">Cultivate a positive mindset with affirmations</p>
+                        <button onclick="openActivity('positiveAffirmations')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                    <div class="activity-card">
+                        <i class="fas fa-book-open"></i>
+                        <h3 data-lang-key="activityStorytellingTitle">Mindful Storytelling</h3>
+                        <p data-lang-key="activityStorytellingDesc">Create or listen to stories with focused attention</p>
+                        <button onclick="openActivity('mindfulStorytelling')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="about" class="about-section">
+                <h2 data-lang-key="aboutTitle">About Mindful Journey</h2>
+                <p data-lang-key="aboutText">Mindful Journey is an initiative by Brain Power to bring mindfulness and wellness education to students and adults in Japan. Based on the Mindfulness in Schools Project (MiSP), our platform provides guided practices and resources for developing mindfulness skills.</p>
+            </section>
+        </main>
+
+        <div id="practice-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div id="practice-content"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p data-lang-key="footerText">&copy; 2025 Brain Power Mindfulness & Wellness</p>
+        </footer>
+    </div>
+    <div id="affirmation-modal" class="modal">
+        <div class="modal-content affirmation-modal-content">
+            <span class="close affirmation-close">&times;</span>
+            <h3 data-lang-key="affirmationPopupTitle">Your Daily Affirmation</h3>
+            <p id="affirmation-text"></p>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

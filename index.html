@@ -13,10 +13,10 @@
             <nav>
                 <div class="logo" data-lang-key="logoText">Mindful Journey</div>
                 <ul class="nav-links">
-                    <li><button id="daily-affirmation-button" class="nav-button" data-lang-key="navDailyAffirmation">Daily Affirmation</button></li>
                     <li><a href="#home" class="active" data-lang-key="navHome">Home</a></li>
                     <li><a href="#practices" data-lang-key="navPractices">Practices</a></li>
                     <li><a href="#student-zone" data-lang-key="navStudentZone">Student Zone</a></li>
+                    <li><a href="#" id="daily-affirmation-link" class="nav-link-item" data-lang-key="navDailyAffirmation">Daily Affirmation</a></li>
                     <li><a href="#about" data-lang-key="navAbout">About</a></li>
                 </ul>
                 <button id="lang-switcher" class="lang-button">JA</button>
@@ -136,6 +136,30 @@
                         <p data-lang-key="activityStorytellingDesc">Create or listen to stories with focused attention</p>
                         <button onclick="openActivity('mindfulStorytelling')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
                     </div>
+                    <div class="activity-card" onclick="openActivity('mindfulMovements')">
+                        <i class="fas fa-street-view"></i>
+                        <h3 data-lang-key="activityMovementsTitle">Mindful Movements</h3>
+                        <p data-lang-key="activityMovementsDesc">Gentle stretches and movements to connect with your body</p>
+                        <button onclick="openActivity('mindfulMovements')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                    <div class="activity-card" onclick="openActivity('sensoryAwareness')">
+                        <i class="fas fa-hand-paper"></i>
+                        <h3 data-lang-key="activitySensoryTitle">Sensory Awareness</h3>
+                        <p data-lang-key="activitySensoryDesc">Explore the world around you by focusing on one sense at a time</p>
+                        <button onclick="openActivity('sensoryAwareness')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                    <div class="activity-card" onclick="openActivity('natureObservation')">
+                        <i class="fas fa-leaf"></i>
+                        <h3 data-lang-key="activityNatureTitle">Nature Observation</h3>
+                        <p data-lang-key="activityNatureDesc">Connect with the natural world by observing plants, animals, or the sky</p>
+                        <button onclick="openActivity('natureObservation')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
+                    <div class="activity-card" onclick="openActivity('kindnessReflection')">
+                        <i class="fas fa-heart"></i>
+                        <h3 data-lang-key="activityKindnessTitle">Kindness Reflection</h3>
+                        <p data-lang-key="activityKindnessDesc">Reflect on acts of kindness, given and received</p>
+                        <button onclick="openActivity('kindnessReflection')" class="activity-action-button" data-lang-key="startActivityButton">Start Activity</button>
+                    </div>
                 </div>
             </section>
 
@@ -164,7 +188,18 @@
         </div>
     </div>
 
+    <div id="activity-modal" class="modal">
+        <div class="modal-content activity-modal-content">
+            <span class="close activity-close">&times;</span>
+            <h3 id="activity-title" data-lang-key="activityModalTitlePlaceholder">Activity Title</h3>
+            <div id="activity-content">
+                <!-- Activity-specific content will be loaded here -->
+                <p data-lang-key="activityModalContentPlaceholder">Activity content will appear here.</p>
+            </div>
+        </div>
+    </div>
+
     <script src="translations.js"></script>
-    <script src="app.js"></script>
+    <script src="Mindful Journey.js"></script>
 </body>
 </html>

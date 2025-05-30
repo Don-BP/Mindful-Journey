@@ -64,22 +64,6 @@ nav {
     color: var(--primary-color);
 }
 
-.nav-button {
-    background-color: transparent;
-    color: #fff;
-    border: 1px solid #fff;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.nav-button:hover {
-    background-color: #fff;
-    color: #4a90e2;
-}
-
 .lang-button {
     background-color: var(--primary-color);
     color: white;
@@ -167,7 +151,7 @@ h2 {
 }
 
 .modal {
-    display: none;
+    display: none; /* JS changes to 'flex' to show */
     position: fixed;
     top: 0;
     left: 0;
@@ -175,16 +159,20 @@ h2 {
     height: 100%;
     background-color: rgba(0,0,0,0.5);
     z-index: 1001;
+    align-items: center; /* Added for centering */
+    justify-content: center; /* Added for centering */
 }
 
 .modal-content {
     background-color: var(--card-background);
-    margin: 15% auto;
+    /* margin: 15% auto; */ /* Removed for flex centering */
     padding: 2rem;
     width: 90%;
     max-width: 600px;
     border-radius: 10px;
     position: relative;
+    max-height: 85vh; /* Added */
+    overflow-y: auto; /* Added */
 }
 
 .close {

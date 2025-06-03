@@ -201,6 +201,37 @@ h2 {
     min-height: 50px; /* Ensure space for text */
 }
 
+.favorite-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: #ccc; /* Default empty heart color */
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.favorite-icon:hover {
+    color: #ff8a80; /* Light red on hover */
+    transform: scale(1.1);
+}
+
+.favorite-icon.favorited .fa-heart::before {
+    content: "\f004"; /* Font Awesome solid heart character */
+    font-weight: 900; /* Ensure solid heart is used */
+    color: #ff4081; /* Filled heart color (e.g., pink/red) */
+}
+
+.affirmation-modal-content .favorite-icon {
+    top: 15px; /* Example adjustment */
+    right: 40px; /* Next to the close button */
+}
+
+.favorite-icon .fa-heart {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 400; /* Regular weight for empty heart */
+}
+
 .activity-action-button {
     background-color: var(--primary-color);
     color: white;
@@ -238,6 +269,48 @@ h2 {
     text-decoration: none;
     cursor: pointer;
 }
+
+/* Favorite Icon Styles */
+.favorite-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem; /* Adjust size as needed */
+    color: #ccc; /* Default empty heart color */
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.favorite-icon:hover {
+    color: #ff8a80; /* Light red on hover */
+    transform: scale(1.1);
+}
+
+.favorite-icon.favorited .fa-heart::before {
+    content: "\f004"; /* Font Awesome solid heart character */
+    font-weight: 900; /* Ensure solid heart is used */
+    color: #ff4081; /* Filled heart color (e.g., pink/red) */
+}
+
+/* Adjust positioning for affirmation modal favorite icon if needed */
+.affirmation-modal-content .favorite-icon {
+    top: 15px; /* Example adjustment */
+    right: 40px; /* Next to the close button */
+}
+
+/* Ensure practice and activity cards are positioned relatively for absolute positioning of icon */
+.practice-card,
+.activity-card {
+    position: relative;
+    padding-top: 40px; /* Add some padding to the top if icons overlap content */
+}
+
+/* Ensure Font Awesome regular (far) is loaded for empty heart by default */
+.favorite-icon .fa-heart {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 400; /* Regular weight for empty heart */
+}
+
 
 
 @media (max-width: 768px) {

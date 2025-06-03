@@ -105,6 +105,8 @@ const translations = {
         // Modal Titles (will need to be dynamic in app.js for practice/activity specific titles)
         // General
         logoText: "Mindful Journey",
+        addToFavorites: "Add to favorites",
+        removeFromFavorites: "Remove from favorites",
 
         // Modal Generic
         modalCloseButton: "Close",
@@ -437,6 +439,8 @@ const translations = {
         // Modal Titles (will need to be dynamic in app.js for practice/activity specific titles)
         // General
         logoText: "マインドフルジャーニー",
+        addToFavorites: "お気に入りに追加",
+        removeFromFavorites: "お気に入りから削除",
 
         // Modal Generic
         modalCloseButton: "閉じる",

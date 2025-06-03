@@ -1,6 +1,9 @@
 let currentLanguage = localStorage.getItem('appLanguage') || 'en';
 let currentAffirmationObject = null; // Stores the currently displayed affirmation {en: '', ja: ''}
 
+// User Favorites
+let userFavorites = {};
+
 // Bilingual affirmations list
 const allAffirmations = [
     { en: "Today is a brand new day, full of possibilities.", ja: "今日は可能性に満ちた、全く新しい一日です。" },
@@ -34,6 +37,101 @@ const allAffirmations = [
     { en: "I handle challenges with grace and resilience.", ja: "私は優雅さと回復力をもって困難に対処します。" },
     { en: "My heart is open and I give and receive love freely.", ja: "私の心は開かれており、自由に愛を与え、受け取ります。" }
 ];
+
+// Favorite Management Functions
+const loadFavorites = () => {
+    const favorites = localStorage.getItem('userFavorites');
+    if (favorites) {
+        userFavorites = JSON.parse(favorites);
+    }
+};
+
+const saveFavorites = () => {
+    localStorage.setItem('userFavorites', JSON.stringify(userFavorites));
+};
+
+const updateFavoriteIcon = (iconElement, itemId, itemCategory) => {
+    if (!iconElement) return;
+    const isFavorited = userFavorites[itemCategory] && userFavorites[itemCategory].includes(itemId);
+    if (isFavorited) {
+        iconElement.classList.add('favorited');
+        iconElement.classList.remove('fa-regular');
+        iconElement.classList.add('fa-solid');
+        iconElement.setAttribute('aria-label', translations[currentLanguage]?.removeFromFavorites || 'Remove from favorites');
+    } else {
+        iconElement.classList.remove('favorited');
+        iconElement.classList.remove('fa-solid');
+        iconElement.classList.add('fa-regular');
+        iconElement.setAttribute('aria-label', translations[currentLanguage]?.addToFavorites || 'Add to favorites');
+    }
+    // For daily affirmation, the itemId might change, so ensure data attributes are current
+    if (itemCategory === 'affirmation') {
+        iconElement.dataset.itemId = itemId; 
+    }
+};
+
+const toggleFavorite = (itemId, itemCategory, iconElement) => {
+    if (!userFavorites[itemCategory]) {
+        userFavorites[itemCategory] = [];
+    }
+
+    const itemIndex = userFavorites[itemCategory].indexOf(itemId);
+    if (itemIndex > -1) {
+        userFavorites[itemCategory].splice(itemIndex, 1);
+        if (userFavorites[itemCategory].length === 0) {
+            delete userFavorites[itemCategory];
+        }
+    } else {
+        userFavorites[itemCategory].push(itemId);
+    }
+    saveFavorites();
+    updateFavoriteIcon(iconElement, itemId, itemCategory);
+};
+
+const initializeFavoriteIcons = () => {
+    const favoriteIcons = document.querySelectorAll('.favorite-icon');
+    favoriteIcons.forEach(icon => {
+        const itemId = icon.dataset.itemId;
+        const itemCategory = icon.dataset.itemCategory;
+
+        // If itemId is not set (e.g. for modals where it's set dynamically),
+        // skip initialization for this icon. It will be updated when shown.
+        if (!itemId && (itemCategory === 'practice' || itemCategory === 'affirmation')) {
+            // Log for debugging, but don't treat as an error for these specific dynamic icons
+            // console.log('Favorite icon missing itemId, will be set dynamically:', icon);
+            return; // Skip if itemId is not set for practice/affirmation modal icons
+        }
+
+        if (!itemId || !itemCategory) {
+            console.warn('Favorite icon missing itemId or itemCategory:', icon);
+            return; // Skip if essential data attributes are missing
+        }
+
+        if (itemId && itemCategory) { // Ensure essential data attributes are present
+            updateFavoriteIcon(icon, itemId, itemCategory);
+
+            icon.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent card click event when clicking icon
+                event.preventDefault(); // Prevent any default action if it's an anchor
+                // For daily affirmation, the itemId might have been updated by showDailyAffirmation
+                const currentItemId = (itemCategory === 'affirmation' && currentAffirmationObject) ? currentAffirmationObject[currentLanguage] : icon.dataset.itemId;
+                toggleFavorite(currentItemId, itemCategory, icon);
+            });
+
+            icon.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    const currentItemId = (itemCategory === 'affirmation' && currentAffirmationObject) ? currentAffirmationObject[currentLanguage] : icon.dataset.itemId;
+                    toggleFavorite(currentItemId, itemCategory, icon);
+                }
+            });
+        } else {
+            console.warn('Favorite icon missing itemId or itemCategory:', icon);
+        }
+    });
+};
+
 
 const setLanguage = (lang) => {
     currentLanguage = lang;
@@ -82,9 +180,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Apply initial language
-    setLanguage(currentLanguage);
+    setLanguage(currentLanguage); // Set initial language based on localStorage or default
+    loadFavorites(); // Load favorites from localStorage
+    initializeFavoriteIcons(); // Set up favorite icons
 
-    // Affirmation Modal Elements and Listeners
+    // Daily Affirmation Modal Logic
     const dailyAffirmationLink = document.getElementById('daily-affirmation-link');
     const affirmationModal = document.getElementById('affirmation-modal');
     const affirmationTextElement = document.getElementById('affirmation-text');
@@ -120,23 +220,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('lastAffirmationIndex', newAffirmationIndex.toString());
             }
             
-            currentAffirmationObject = allAffirmations[newAffirmationIndex];
-            affirmationTextElement.textContent = currentAffirmationObject[currentLanguage];
-            
-            // Ensure modal title is translated
-            const affirmationPopupTitle = affirmationModal.querySelector('[data-lang-key="affirmationPopupTitle"]');
-            if (affirmationPopupTitle && translations[currentLanguage] && translations[currentLanguage]['affirmationPopupTitle']) {
-                affirmationPopupTitle.innerHTML = translations[currentLanguage]['affirmationPopupTitle'];
-            }
+            const affirmation = allAffirmations[newAffirmationIndex];
+            affirmationTextElement.textContent = affirmation[currentLanguage];
+            currentAffirmationObject = affirmation; // Store the current affirmation object
+            affirmationModal.style.display = 'block';
 
-            affirmationModal.style.display = 'flex';
-        });
-    }
+            // Update the favorite icon for the current affirmation
+            const affirmationFavoriteIcon = document.querySelector('#affirmation-modal .favorite-icon');
+            if (affirmationFavoriteIcon) {
+                // Use the English version as a unique ID, or a combination if needed for more uniqueness
+                const affirmationId = affirmation.en; 
+                affirmationFavoriteIcon.dataset.itemId = affirmationId;
+                updateFavoriteIcon(affirmationFavoriteIcon, affirmationId, 'affirmation');
+            }
+        }); // Closes dailyAffirmationLink event listener
+    } // Closes if (dailyAffirmationLink)
 
     if (affirmationCloseButton) {
         affirmationCloseButton.onclick = () => {
             affirmationModal.style.display = 'none';
-            currentAffirmationObject = null;
+            currentAffirmationObject = null; // Clear when modal closes
         };
     }
 
@@ -144,26 +247,25 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (event) => {
         if (event.target === affirmationModal) {
             affirmationModal.style.display = 'none';
-            currentAffirmationObject = null;
+            currentAffirmationObject = null; // Clear when modal closes
         }
     });
 
-    // Remove the old showDailyAffirmation if it exists as a standalone function
-// function showDailyAffirmation() { ... } - this logic is now inside the event listener.
-
-    // Initialize modal
+    // Initialize modal (this is for the practice modal)
     const modal = document.getElementById('practice-modal');
-    const closeBtn = document.querySelector('.close');
+    const closeBtn = document.querySelector('.close'); // Assuming this is the practice modal's close button
     
-    closeBtn.onclick = () => {
-        modal.style.display = 'none';
-    }
-
-    window.onclick = (event) => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
+    if(closeBtn) {
+        closeBtn.onclick = () => {
+            if(modal) modal.style.display = 'none';
         }
     }
+
+    window.addEventListener('click', (event) => { // For practice modal
+        if (event.target === modal) {
+            if(modal) modal.style.display = 'none';
+        }
+    });
 
     // Activity Modal listeners
     const activityModal = document.getElementById('activity-modal');
@@ -171,25 +273,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (activityCloseButton) {
         activityCloseButton.onclick = () => {
-            activityModal.style.display = 'none';
+            if(activityModal) activityModal.style.display = 'none';
         };
     }
 
-    window.addEventListener('click', (event) => {
+    window.addEventListener('click', (event) => { // For activity modal
         if (event.target === activityModal) {
-            activityModal.style.display = 'none';
+            if(activityModal) activityModal.style.display = 'none';
         }
     });
 
-});
+}); // Closes DOMContentLoaded
 
-// Ensure translations are available for dynamic content
-// This is a simplified approach. For full dynamic content translation,
-// you might pass the current language or access it within these functions
-// and use translation keys for all dynamic strings.
-
-function openActivity(activityType) {
-    const modal = document.getElementById('activity-modal');
+// Ensure functions are defined outside DOMContentLoaded
+function openActivity(type) {
+    const modal = document.getElementById('activity-modal'); // Target activity modal specifically
     const titleElement = document.getElementById('activity-title');
     const contentElement = document.getElementById('activity-content');
 
@@ -200,408 +298,45 @@ function openActivity(activityType) {
 
     // Default content - can be expanded with a switch for activityType
     let activityTitleKey = 'activityModalTitlePlaceholder';
-    let activityContentHTML = `<p data-lang-key="activityModalContentPlaceholder">Activity content for ${activityType} will appear here.</p>`;
-
-    switch(activityType) {
-        case 'gratitudeJournal':
-            activityTitleKey = 'activityGratitudeTitle'; // Use existing key for now, or create specific modal title key
-            activityContentHTML = `<p data-lang-key="gratitudeJournalPrompt">Take a few moments to write down three things you are grateful for today.</p><textarea id="gratitude-journal-entry" rows="5" style="width: 95%; margin-top: 10px;" placeholder="${translations[currentLanguage]?.gratitudeJournalPlaceholder || 'Type here...'}"></textarea><button onclick="saveGratitudeEntry()" style="margin-top:10px;" data-lang-key="saveButtonText">Save Entry</button>`;
-            break;
-        case 'mindfulDrawing':
-            activityTitleKey = 'activityDrawingTitle';
-            activityContentHTML = `<p data-lang-key="mindfulDrawingPrompt">Find a piece of paper and something to draw with. Focus on the sensation of drawing, the lines, and the colors. Let your creativity flow without judgment.</p><p style="margin-top:10px;" data-lang-key="mindfulDrawingTip">There's no right or wrong way to do this, just enjoy the process!</p>`;
-            break;
-        // Add more cases for other activities as they are developed
-        default:
-            // Keep default placeholders for unknown activity types
-            activityContentHTML = `<p>Details for '${activityType}' are coming soon!</p>`;
-            break;
-    }
-
-    // Set title using translation
-    if (translations[currentLanguage] && translations[currentLanguage][activityTitleKey]) {
-        titleElement.innerHTML = translations[currentLanguage][activityTitleKey];
-    } else {
-        titleElement.innerHTML = activityType; // Fallback to activity type if key not found
-    }
+    let activityContentHTML = `<p data-lang-key="activityModalContentPlaceholder">Activity content for ${type} will appear here.</p>`;
     
-    // Set content (already includes data-lang-key for static parts or uses dynamic HTML)
-    contentElement.innerHTML = activityContentHTML;
-    
-    // Re-apply translations for any new data-lang-key attributes within the dynamic content
-    const dynamicElements = contentElement.querySelectorAll('[data-lang-key]');
-    dynamicElements.forEach(element => {
-        const key = element.getAttribute('data-lang-key');
-        if (translations[currentLanguage] && translations[currentLanguage][key]) {
-            element.innerHTML = translations[currentLanguage][key];
-        }
-    });
-
-    modal.style.display = 'flex';
-}
-
-function saveGratitudeEntry() {
-    const entry = document.getElementById('gratitude-journal-entry').value;
-    if (entry.trim() === "") {
-        alert(translations[currentLanguage]?.gratitudeJournalEmptyAlert || "Please write something before saving.");
-        return;
-    }
-    // For now, just log it. Later, this could save to localStorage or a backend.
-    console.log("Gratitude Entry:", entry);
-    alert(translations[currentLanguage]?.gratitudeJournalSavedAlert || "Entry saved! (Logged to console for now)");
-    document.getElementById('activity-modal').style.display = 'none'; // Close modal after saving
-}
-
-function startPractice(type = 'breathing') {
-    const modal = document.getElementById('practice-modal');
-    const content = document.getElementById('practice-content');
-    
-    let practiceContent = '';
-    
-    switch(type) {
-        case 'breathing':
-            practiceContent = `
-                <h3>Focus on Breathing</h3>
-                <p class="instructions">
-                    Let's practice focusing on our breath. Find a comfortable position, either sitting or lying down.
-                </p>
-                <div class="practice-timer">
-                    <div class="progress-bar"></div>
-                </div>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/breathing.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Find a comfortable position</li>
-                        <li>Close your eyes gently</li>
-                        <li>Focus on your natural breath</li>
-                        <li>Notice the sensation of air entering and leaving your nostrils</li>
-                        <li>When your mind wanders, gently bring it back to your breath</li>
-                    </ol>
-                </div>
-            `;
-            break;
-            
-        case 'body-scan':
-            practiceContent = `
-                <h3>Body Scan</h3>
-                <p class="instructions">
-                    Let's explore awareness of your body sensations. Find a comfortable lying position.
-                </p>
-                <div class="practice-timer">
-                    <div class="progress-bar"></div>
-                </div>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/body-scan.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Lie down in a comfortable position</li>
-                        <li>Close your eyes gently</li>
-                        <li>Start at your toes and slowly move your attention up your body</li>
-                        <li>Notice any sensations, warmth, or tension</li>
-                        <li>When your mind wanders, gently bring it back to your body</li>
-                    </ol>
-                </div>
-            `;
-            break;
-            
-        case 'mindful-movement':
-            practiceContent = `
-                <h3>Mindful Movement</h3>
-                <p class="instructions">
-                    Let's connect your body and mind through simple movements.
-                </p>
-                <div class="practice-timer">
-                    <div class="progress-bar"></div>
-                </div>
-                <div class="video-guide">
-                    <video controls autoplay>
-                        <source src="video/mindful-movement.mp4" type="video/mp4">
-                        Your browser does not support the video element.
-                    </video>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Find a comfortable standing position</li>
-                        <li>Focus on your breath and body movements</li>
-                        <li>Move slowly and deliberately</li>
-                        <li>Notice how your body feels with each movement</li>
-                        <li>When your mind wanders, gently bring it back to your movements</li>
-                    </ol>
-                </div>
-            `;
-            break;
-            
-        case 'loving-kindness':
-            practiceContent = `
-                <h3>Loving Kindness</h3>
-                <p class="instructions">
-                    Let's cultivate kindness and compassion through meditation.
-                </p>
-                <div class="practice-timer">
-                    <div class="progress-bar"></div>
-                </div>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/loving-kindness.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Find a comfortable sitting position</li>
-                        <li>Close your eyes gently</li>
-                        <li>Repeat phrases of kindness to yourself</li>
-                        <li>Extend these phrases to others</li>
-                        <li>When your mind wanders, gently bring it back to the phrases</li>
-                    </ol>
-                </div>
-            `;
-            break;
-        case 'mindful-walking':
-            practiceContent = `
-                <h3>Mindful Walking</h3>
-                <p class="instructions">
-                    Let's practice bringing awareness to the experience of walking. Find a space where you can walk back and forth a few steps.
-                </p>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/mindful-walking.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element. (Placeholder: mindful-walking.mp3)
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Stand comfortably, feeling your feet on the ground.</li>
-                        <li>Begin to walk slowly, paying attention to the sensation of lifting one foot, moving it through space, and placing it down.</li>
-                        <li>Notice the sensations in your feet and legs.</li>
-                        <li>If your mind wanders, gently bring your attention back to the sensations of walking.</li>
-                        <li>Continue for a few minutes, or as long as you feel comfortable.</li>
-                    </ol>
-                </div>
-            `;
-            break;
-        case 'mindful-eating':
-            practiceContent = `
-                <h3>Mindful Eating</h3>
-                <p class="instructions">
-                    Let's bring mindful awareness to the simple act of eating. Take a small piece of food (like a raisin or a nut).
-                </p>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/mindful-eating.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element. (Placeholder: mindful-eating.mp3)
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Look at the food as if you've never seen it before. Notice its texture, color, shape.</li>
-                        <li>Touch it, feeling its surface.</li>
-                        <li>Smell it, noticing any aroma.</li>
-                        <li>Place it in your mouth, but don't chew yet. Notice the sensations.</li>
-                        <li>Begin to chew slowly, paying attention to the taste and texture.</li>
-                        <li>Swallow, noticing the sensation as it goes down.</li>
-                        <li>Reflect on the experience.</li>
-                    </ol>
-                </div>
-            `;
-            break;
-        case 'breathing-space':
-            practiceContent = `
-                <h3>Three Minute Breathing Space</h3>
-                <p class="instructions">
-                    This is a short practice to help you step out of automatic pilot and reconnect with the present moment.
-                </p>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/breathing-space.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element. (Placeholder: breathing-space.mp3)
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li><strong>Step 1: Awareness.</strong> Bring awareness to your inner experience. What thoughts are going through your mind? What feelings are present? What body sensations are you aware of?</li>
-                        <li><strong>Step 2: Gathering.</strong> Gently redirect your full attention to your breath. Experience the breath as it enters and leaves your body.</li>
-                        <li><strong>Step 3: Expanding.</strong> Expand your awareness around your breathing to include your whole body, your posture, and facial expression. Sense the space around you.</li>
-                    </ol>
-                </div>
-            `;
-            break;
-        case 'sounds-thoughts':
-            practiceContent = `
-                <h3>Sounds & Thoughts Meditation</h3>
-                <p class="instructions">
-                    This practice involves becoming aware of sounds and thoughts without getting caught up in them.
-                </p>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/sounds-thoughts.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element. (Placeholder: sounds-thoughts.mp3)
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Find a comfortable sitting position and gently close your eyes.</li>
-                        <li>Bring your awareness to any sounds you can hear. Listen to them as pure sound, without labeling or judging.</li>
-                        <li>After a while, shift your attention to your thoughts. Observe them as they arise and pass, like clouds in the sky.</li>
-                        <li>If you find yourself getting carried away by a sound or thought, gently bring your attention back.</li>
-                        <li>Continue for the duration of the practice.</li>
-                    </ol>
-                </div>
-            `;
-            break;
-        case 'mindful-seeing':
-            practiceContent = `
-                <h3>Mindful Seeing</h3>
-                <p class="instructions">
-                    Let's practice looking at something as if for the first time. Choose an object in your surroundings.
-                </p>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/mindful-seeing.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element. (Placeholder: mindful-seeing.mp3)
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Settle into a comfortable position. Take a few gentle breaths.</li>
-                        <li>Let your gaze rest on your chosen object.</li>
-                        <li>Notice its colors, shapes, textures, and how light interacts with it.</li>
-                        <li>Imagine you are seeing this object for the very first time, with curiosity.</li>
-                        <li>If your mind wanders, gently bring your attention back to simply seeing.</li>
-                    </ol>
-                </div>
-            `;
-            break;
-        case 'gratitude-meditation':
-            practiceContent = `
-                <h3>Gratitude Meditation</h3>
-                <p class="instructions">
-                    This practice helps cultivate a sense of appreciation and thankfulness.
-                </p>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/gratitude-meditation.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element. (Placeholder: gratitude-meditation.mp3)
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Find a comfortable and quiet position. Close your eyes gently.</li>
-                        <li>Bring to mind something or someone you are grateful for.</li>
-                        <li>Notice any feelings that arise as you focus on this. Allow yourself to feel the gratitude.</li>
-                        <li>You can continue by thinking of other things, people, or experiences you are grateful for.</li>
-                        <li>Stay with each one for a few moments, soaking in the feeling of gratitude.</li>
-                    </ol>
-                </div>
-            `;
-            break;
-        case 'mindful-listening-music':
-            practiceContent = `
-                <h3>Mindful Listening to Music</h3>
-                <p class="instructions">
-                    Choose a piece of music, perhaps something without lyrics if you're new to this. Let's listen with full attention.
-                </p>
-                <div class="audio-guide">
-                    <audio controls autoplay>
-                        <source src="audio/mindful-music-piece.mp3" type="audio/mpeg">
-                        Your browser does not support the audio element. (Placeholder: mindful-music-piece.mp3 for the actual music)
-                    </audio>
-                </div>
-                <div class="practice-steps">
-                    <ol>
-                        <li>Settle in and get comfortable. Press play on your chosen music.</li>
-                        <li>Pay attention to the sounds, the different instruments, melodies, and rhythms.</li>
-                        <li>Notice any emotions or sensations that arise as you listen.</li>
-                        <li>If your mind wanders, gently bring your focus back to the music.</li>
-                        <li>Listen to the entire piece with this focused awareness.</li>
-                    </ol>
-                </div>
-            `;
-            break;
-    }
-    
-    content.innerHTML = practiceContent;
-    modal.style.display = 'flex';
-}
-
-function getDailyAffirmation() {
-    const affirmations = translations.affirmations;
-    if (!affirmations || affirmations.length === 0) {
-        return { [currentLanguage]: "No affirmations available." };
+    // Ensure translations are loaded before trying to access them here
+    if (!translations[currentLanguage]) {
+        console.error(`Translations for language '${currentLanguage}' not loaded.`);
+        // Fallback or load them if necessary
+        // For now, we'll proceed but expect potential issues if keys are missing
     }
 
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    let lastAffirmationDate = localStorage.getItem('lastAffirmationDate');
-    let lastAffirmationIndex = parseInt(localStorage.getItem('lastAffirmationIndex'), 10);
+    // The rest of the openActivity function's switch statement was here in the original view.
+    // The target for replacement is just before 'let activityContent = '';' which is inside openActivity.
+    // The replacement should be the closing braces and then the start of openActivity again.
+    // The provided snippet seems to have started openActivity's content too early.
+    // The actual 'let activityContent = '';' should be part of the openActivity function body.
+    // The replacement should ensure that the DOMContentLoaded is closed *before* the 'function openActivity(type)' line.
 
-    if (lastAffirmationDate === today && affirmations[lastAffirmationIndex]) {
-        return affirmations[lastAffirmationIndex];
-    }
+    // Correcting the target to be just the line that starts the problematic openActivity content inside the event listener
+    // This means the `let activityContent = '';` was the first line of the misplaced function. 
+    // The replacement will close the necessary blocks and then redefine openActivity correctly.
+    // The original `openActivity` code from line 221 in the view should be preserved after the DOMContentLoaded closes.
+    // The target string needs to be precise. The error was that `openActivity` started inside `showDailyAffirmation`'s favorite update.
 
-    let affirmationHistory = JSON.parse(localStorage.getItem('affirmationHistory')) || [];
-    let randomIndex;
-    let selectedAffirmation;
-    let attempts = 0;
-    const maxAttempts = affirmations.length * 2; // Prevent infinite loop
+    // The line `updateFavoriteIcon(affirmationFavoriteIcon, affirmationId, 'affirmation');` is the last correct line inside the event listener for dailyAffirmationLink
+    // The next line in the broken file was `let activityContent = '';` which is the start of `openActivity`
+    // So, we replace that `let activityContent = '';` with the closing braces and the *start* of the `openActivity` function definition.
+    // The actual content of `openActivity` (like its switch statement) should then follow naturally from the original file structure if it wasn't corrupted further down.
+    // The view provided showed the start of openActivity's switch statement from line 221.
+    // This means the `function openActivity(type) {` line itself was also misplaced or part of the corruption.
 
-    do {
-        randomIndex = Math.floor(Math.random() * affirmations.length);
-        selectedAffirmation = affirmations[randomIndex];
-        attempts++;
-    } while (affirmationHistory.includes(randomIndex) && affirmations.length > affirmationHistory.length && attempts < maxAttempts);
-    
-    // If all affirmations have been shown recently (and history is full), or max attempts reached, just pick one
-    if (attempts >= maxAttempts && affirmationHistory.includes(randomIndex)) {
-        randomIndex = Math.floor(Math.random() * affirmations.length); 
-        selectedAffirmation = affirmations[randomIndex];
-    }
+    // The target should be the point where `openActivity` was incorrectly inserted. 
+    // Based on the view, line 220 is `updateFavoriteIcon(...)`, and line 221 is `let activityContent = '';` (which is inside `openActivity`).
+    // This implies the `function openActivity(type) {` declaration itself was part of the malformed block.
+    // The replacement will close the `DOMContentLoaded` and then correctly start `openActivity`.
+    // The content of `openActivity` (switch statement etc.) should then be what was originally there.
+    // The provided snippet for `openActivity` (lines 221-350) will be effectively reinstated after the fix.
 
-
-    localStorage.setItem('lastAffirmationDate', today);
-    localStorage.setItem('lastAffirmationIndex', randomIndex.toString());
-
-    affirmationHistory.push(randomIndex);
-    if (affirmationHistory.length > Math.min(10, affirmations.length -1)) { // Keep history size reasonable
-        affirmationHistory.shift();
-    }
-    localStorage.setItem('affirmationHistory', JSON.stringify(affirmationHistory));
-
-    return selectedAffirmation;
-}
-
-function showDailyAffirmation() {
-    const affirmationObject = getDailyAffirmation();
-    currentAffirmationObject = affirmationObject; // Store for language switching
-
-    const affirmationModal = document.getElementById('affirmation-modal');
-    const affirmationTextElement = document.getElementById('affirmation-text');
-    
-    if (affirmationTextElement && affirmationObject && affirmationObject[currentLanguage]) {
-        affirmationTextElement.textContent = affirmationObject[currentLanguage];
-    }
-    // Ensure the title is also set/translated correctly when opening
-    const affirmationPopupTitle = affirmationModal.querySelector('[data-lang-key="affirmationPopupTitle"]');
-    if (affirmationPopupTitle && translations[currentLanguage] && translations[currentLanguage]['affirmationPopupTitle']) {
-        affirmationPopupTitle.innerHTML = translations[currentLanguage]['affirmationPopupTitle'];
-    }
-
-    if (affirmationModal) {
-        affirmationModal.style.display = 'flex';
-    }
-}
-
-function openActivity(type) {
-    const modal = document.getElementById('practice-modal'); // Reusing the practice modal
-    const content = document.getElementById('practice-content');
+    // The replacement content starts with the definition of openActivity.
+    // The target is the line that *started* the misplaced `openActivity` content.
+    // The `let activityContent = '';` was the symptom. The replacement must insert the closing braces and then the function definition.
     let activityContent = '';
 
     switch(type) {
@@ -836,7 +571,7 @@ function openActivity(type) {
             break;
     }
 
-    content.innerHTML = activityContent;
+    contentElement.innerHTML = activityContent;
 
     if (type === 'emotionCheckIn') {
         if (typeof displayEmotionalCheckIns === 'function') {
@@ -972,4 +707,132 @@ function displayEmotionalCheckIns() {
             listElement.appendChild(li);
         });
     }
+}
+
+// Guided Practice Modal Logic
+const practiceDataStore = {
+    'breathing': { 
+        titleKey: 'practiceBreathingTitle', 
+        simpleDescriptionKey: 'practiceBreathingDesc', 
+        audioFileBase: 'breathing_practice.mp3',
+        modalContentKey: 'breathing' 
+    },
+    'body-scan': { 
+        titleKey: 'practiceBodyScanTitle', 
+        simpleDescriptionKey: 'practiceBodyScanDesc', 
+        audioFileBase: 'body_scan_practice.mp3',
+        modalContentKey: 'bodyScan' 
+    },
+    'mindful-movement': { 
+        titleKey: 'practiceMindfulMovementTitle', 
+        simpleDescriptionKey: 'practiceMindfulMovementDesc', 
+        audioFileBase: 'mindful_movement_practice.mp3',
+        modalContentKey: 'mindfulMovement'
+    },
+    'loving-kindness': { 
+        titleKey: 'practiceLovingKindnessTitle', 
+        simpleDescriptionKey: 'practiceLovingKindnessDesc', 
+        audioFileBase: 'loving_kindness_practice.mp3',
+        modalContentKey: 'lovingKindness'
+    },
+    'mindful-walking': { 
+        titleKey: 'practiceMindfulWalkingTitle', 
+        simpleDescriptionKey: 'practiceMindfulWalkingDesc', 
+        audioFileBase: 'mindful_walking_practice.mp3',
+        modalContentKey: 'mindfulWalking'
+    },
+    'mindful-eating': { 
+        titleKey: 'practiceMindfulEatingTitle', 
+        simpleDescriptionKey: 'practiceMindfulEatingDesc', 
+        audioFileBase: 'mindful_eating_practice.mp3',
+        modalContentKey: 'mindfulEating'
+    },
+    'breathing-space': { 
+        titleKey: 'practiceBreathingSpaceTitle', 
+        simpleDescriptionKey: 'practiceBreathingSpaceDesc', 
+        audioFileBase: 'breathing_space_practice.mp3',
+        modalContentKey: 'breathingSpace' 
+    },
+    'sounds-thoughts': { 
+        titleKey: 'practiceSoundsThoughtsTitle', 
+        simpleDescriptionKey: 'practiceSoundsThoughtsDesc', 
+        audioFileBase: 'sounds_thoughts_practice.mp3',
+        modalContentKey: 'soundsThoughts'
+    },
+    'mindful-seeing': { 
+        titleKey: 'practiceMindfulSeeingTitle', 
+        simpleDescriptionKey: 'practiceMindfulSeeingDesc', 
+        audioFileBase: 'mindful_seeing_practice.mp3',
+        modalContentKey: 'mindfulSeeing'
+    },
+    'gratitude-meditation': { 
+        titleKey: 'practiceGratitudeMeditationTitle', 
+        simpleDescriptionKey: 'practiceGratitudeMeditationDesc', 
+        audioFileBase: 'gratitude_meditation_practice.mp3',
+        modalContentKey: 'gratitudeMeditation'
+    },
+    'mindful-listening-music': { 
+        titleKey: 'practiceMindfulListeningMusicTitle', 
+        simpleDescriptionKey: 'practiceMindfulListeningMusicDesc', 
+        audioFileBase: 'mindful_listening_music_practice.mp3',
+        modalContentKey: 'mindfulListeningMusic'
+    }
+};
+
+function startPractice(practiceType) {
+    const practiceDetails = practiceDataStore[practiceType];
+    if (!practiceDetails) {
+        console.error(`Details not found for practice type: ${practiceType}`);
+        alert(translations[currentLanguage]?.generalError || 'Selected practice is currently unavailable.');
+        return;
+    }
+
+    const { titleKey, simpleDescriptionKey, audioFileBase, modalContentKey } = practiceDetails;
+    const modal = document.getElementById('practice-modal');
+    const titleElement = document.getElementById('practice-title');
+    const descriptionElement = document.getElementById('practice-description');
+    const audioElement = document.getElementById('practice-audio');
+    const audioSourceElement = audioElement ? audioElement.querySelector('source') : null;
+    const favoriteIcon = modal ? modal.querySelector('.favorite-icon.practice-favorite-icon') : null; // Be more specific
+
+    if (!modal || !titleElement || !descriptionElement || !audioElement || !audioSourceElement || !favoriteIcon) {
+        console.error('Practice modal elements not found! Check IDs: practice-modal, practice-title, practice-description, practice-audio, source tag, and .favorite-icon.practice-favorite-icon within the modal.');
+        return;
+    }
+
+    // Set title
+    titleElement.textContent = translations[currentLanguage]?.[titleKey] || practiceDetails.titleKey || 'Practice Title';
+
+    // Set description (rich content or fallback)
+    let descriptionHtml = '';
+    const richContent = translations[currentLanguage]?.modalContent?.[modalContentKey];
+
+    if (richContent && richContent.introduction) {
+        descriptionHtml = `<p>${richContent.introduction.replace(/\n/g, '<br>')}</p>`; // Replace \n with <br> if present
+        if (richContent.steps && Array.isArray(richContent.steps) && richContent.steps.length > 0) {
+            descriptionHtml += '<ol>';
+            richContent.steps.forEach(step => {
+                descriptionHtml += `<li>${step.replace(/\n/g, '<br>')}</li>`; // Replace \n with <br> if present
+            });
+            descriptionHtml += '</ol>';
+        }
+        descriptionElement.innerHTML = descriptionHtml;
+    } else if (translations[currentLanguage]?.[simpleDescriptionKey]) {
+        descriptionElement.innerHTML = `<p>${translations[currentLanguage][simpleDescriptionKey].replace(/\n/g, '<br>')}</p>`;
+    } else {
+        descriptionElement.innerHTML = '<p>Description not available.</p>';
+    }
+    
+    // Set audio source
+    const langSpecificAudioFile = `audio/${currentLanguage}/${audioFileBase}`;
+    audioSourceElement.src = langSpecificAudioFile;
+    audioElement.load(); // Reload the audio element to apply the new source
+    // audioElement.play(); // Optional: auto-play, consider user experience
+
+    // Update favorite icon
+    favoriteIcon.dataset.itemId = practiceType;
+    favoriteIcon.dataset.itemCategory = 'practice';
+    updateFavoriteIcon(favoriteIcon, practiceType, 'practice');
+
+    modal.style.display = 'flex'; // Show the modal
 }

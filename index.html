@@ -13,87 +13,91 @@
             <nav>
                 <div class="logo" data-lang-key="logoText">Mindful Journey</div>
                 <ul class="nav-links">
-                    <li><a href="#home" class="active" data-lang-key="navHome">Home</a></li>
-                    <li><a href="#practices" data-lang-key="navPractices">Practices</a></li>
-                    <li><a href="#student-zone" data-lang-key="navStudentZone">Student Zone</a></li>
+                    <li><a href="#home" data-section-id="home" class="active" data-lang-key="navHome">Home</a></li>
+                    <li><a href="#practices" data-section-id="practices" data-lang-key="navPractices">Practices</a></li>
+                    <li><a href="#student-zone" data-section-id="student-zone" data-lang-key="navStudentZone">Student Zone</a></li>
+                    <li><a href="#favorites" id="nav-favorites-link" data-section-id="favorites" data-lang-key="navFavorites">Favorites</a></li>
                     <li><a href="#" id="daily-affirmation-link" class="nav-link-item" data-lang-key="navDailyAffirmation">Daily Affirmation</a></li>
-                    <li><a href="#about" data-lang-key="navAbout">About</a></li>
                 </ul>
                 <button id="lang-switcher" class="lang-button">JA</button>
             </nav>
         </header>
 
         <main>
-            <section id="home" class="hero">
+            <section id="home" class="hero current-section">
                 <h1 data-lang-key="heroTitle">Welcome to Mindful Journey</h1>
-                <p data-lang-key="heroSubtitle">Your personal guide to mindfulness and wellness</p>
+                <p class="hero-subtitle-main" data-lang-key="heroSubtitle">Embark on a personal journey of self-discovery and well-being. This space is designed for your self-guided practice in mindfulness and emotional awareness.</p>
+                <div class="home-intro-text">
+                    <p data-lang-key="homeIntroPara1">Here, you'll find a collection of guided practices and interactive activities to help you cultivate presence, manage stress, and enhance your overall well-being. Whether you have a few minutes or a longer period, there's something to support your mindful moment.</p>
+                    <p data-lang-key="homeIntroPara2">Explore breathing exercises, body scans, mindful movement, gratitude journaling, and more – all at your own pace. This is your personal sanctuary for quiet reflection and growth. Take a deep breath, and let's begin.</p>
+                </div>
                 <button onclick="startPractice('breathing')" class="cta-button" data-lang-key="heroButton">Start Your Practice</button>
             </section>
 
             <section id="practices" class="practices-section">
                 <h2 data-lang-key="practicesTitle">Guided Practices</h2>
                 <div class="practice-grid">
-                    <div class="practice-card" onclick="startPractice('breathing')">
+                    <div class="practice-card" data-item-id="breathing" onclick="startPractice('breathing')">
                         <i class="fas fa-lungs"></i>
                         <h3 data-lang-key="practiceBreathingTitle">Focus on Breathing</h3>
                         <span class="favorite-icon" data-item-id="breathing" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceBreathingDesc">Learn to focus your attention on your breath</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('body-scan')">
+                    <div class="practice-card" data-item-id="body-scan" onclick="startPractice('body-scan')">
                         <i class="fas fa-magnifying-glass"></i>
                         <h3 data-lang-key="practiceBodyScanTitle">Body Scan</h3>
                         <span class="favorite-icon" data-item-id="body-scan" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceBodyScanDesc">Explore awareness of your body sensations</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('mindful-movement')">
-                        <i class="fas fa-running"></i>
+                    <div class="practice-card" data-item-id="mindful-movement" onclick="startPractice('mindful-movement')">
+                        <i class="fas fa-person-running"></i> 
                         <h3 data-lang-key="practiceMindfulMovementTitle">Mindful Movement</h3>
                         <span class="favorite-icon" data-item-id="mindful-movement" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceMindfulMovementDesc">Connect your body and mind through movement</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('loving-kindness')">
-                        <i class="fas fa-heart"></i>
+                    <div class="practice-card" data-item-id="loving-kindness" onclick="startPractice('loving-kindness')">
+                        <i class="fas fa-heart-pulse"></i> 
                         <h3 data-lang-key="practiceLovingKindnessTitle">Loving Kindness</h3>
                         <span class="favorite-icon" data-item-id="loving-kindness" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceLovingKindnessDesc">Cultivate kindness and compassion</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('mindful-walking')">
-                        <i class="fas fa-walking"></i>
+                    <div class="practice-card" data-item-id="mindful-walking" onclick="startPractice('mindful-walking')">
+                        <i class="fas fa-person-walking"></i> 
                         <h3 data-lang-key="practiceMindfulWalkingTitle">Mindful Walking</h3>
                         <span class="favorite-icon" data-item-id="mindful-walking" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceMindfulWalkingDesc">Practice awareness while walking</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('mindful-eating')">
-                        <i class="fas fa-apple-alt"></i>
+                    <div class="practice-card" data-item-id="mindful-eating" onclick="startPractice('mindful-eating')">
+                        <i class="fas fa-utensils"></i> 
                         <h3 data-lang-key="practiceMindfulEatingTitle">Mindful Eating</h3>
                         <span class="favorite-icon" data-item-id="mindful-eating" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceMindfulEatingDesc">Bring awareness to the experience of eating</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('breathing-space')">
-                        <i class="fas fa-hourglass-half"></i>
+                    <div class="practice-card" data-item-id="breathing-space" onclick="startPractice('breathing-space')">
+                        <i class="fas fa-clock"></i> 
                         <h3 data-lang-key="practiceBreathingSpaceTitle">Three Minute Breathing Space</h3>
                         <span class="favorite-icon" data-item-id="breathing-space" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceBreathingSpaceDesc">A short practice to reconnect</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('sounds-thoughts')">
-                        <i class="fas fa-assistive-listening-systems"></i>
+                    <div class="practice-card" data-item-id="sounds-thoughts" onclick="startPractice('sounds-thoughts')">
+                        <i class="fas fa-ear-listen"></i> 
                         <h3 data-lang-key="practiceSoundsThoughtsTitle">Sounds & Thoughts</h3>
                         <span class="favorite-icon" data-item-id="sounds-thoughts" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceSoundsThoughtsDesc">Observe sounds and thoughts without judgment</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('mindful-seeing')">
+                    <div class="practice-card" data-item-id="mindful-seeing" onclick="startPractice('mindful-seeing')">
                         <i class="fas fa-eye"></i>
                         <h3 data-lang-key="practiceMindfulSeeingTitle">Mindful Seeing</h3>
                         <span class="favorite-icon" data-item-id="mindful-seeing" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceMindfulSeeingDesc">Observe your surroundings with fresh eyes</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('gratitude-meditation')">
+                    <div class="practice-card" data-item-id="gratitude-meditation" onclick="startPractice('gratitude-meditation')">
                         <i class="fas fa-hand-holding-heart"></i>
                         <h3 data-lang-key="practiceGratitudeMeditationTitle">Gratitude Meditation</h3>
                         <span class="favorite-icon" data-item-id="gratitude-meditation" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="practiceGratitudeMeditationDesc">Focus on and appreciate things you're grateful for</p>
                     </div>
-                    <div class="practice-card" onclick="startPractice('mindful-listening-music')">
+                    <div class="practice-card" data-item-id="mindful-listening-music" onclick="startPractice('mindful-listening-music')">
                         <i class="fas fa-music"></i>
                         <h3 data-lang-key="practiceMindfulListeningMusicTitle">Mindful Listening to Music</h3>
                         <span class="favorite-icon" data-item-id="mindful-listening-music" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
@@ -105,68 +109,68 @@
             <section id="student-zone" class="student-zone">
                 <h2 data-lang-key="studentZoneTitle">Student Zone</h2>
                 <div class="activity-grid">
-                    <div class="activity-card" onclick="openActivity('gratitudeJournal')">
+                    <div class="activity-card" data-item-id="gratitudeJournal" onclick="openActivity('gratitudeJournal')">
                         <i class="fas fa-pen-fancy"></i>
                         <h3 data-lang-key="activityGratitudeTitle">Gratitude Journal</h3>
                         <span class="favorite-icon" data-item-id="gratitudeJournal" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityGratitudeDesc">Write down three things you're grateful for each day</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('mindfulDrawing')">
-                        <i class="fas fa-paint-brush"></i>
+                    <div class="activity-card" data-item-id="mindfulDrawing" onclick="openActivity('mindfulDrawing')">
+                        <i class="fas fa-paint-brush"></i> 
                         <h3 data-lang-key="activityDrawingTitle">Mindful Drawing</h3>
                         <span class="favorite-icon" data-item-id="mindfulDrawing" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityDrawingDesc">Create art while focusing on the present moment</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('mindfulListening')">
-                        <i class="fas fa-headphones-alt"></i>
+                    <div class="activity-card" data-item-id="mindfulListening" onclick="openActivity('mindfulListening')">
+                        <i class="fas fa-headphones"></i> 
                         <h3 data-lang-key="activityListeningTitle">Mindful Listening</h3>
                         <span class="favorite-icon" data-item-id="mindfulListening" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityListeningDesc">Practice active listening with different sounds</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('emotionCheckIn')">
+                    <div class="activity-card" data-item-id="emotionCheckIn" onclick="openActivity('emotionCheckIn')">
                         <i class="fas fa-brain"></i>
                         <h3 data-lang-key="activityEmotionTitle">Emotion Check-In</h3>
                         <span class="favorite-icon" data-item-id="emotionCheckIn" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityEmotionDesc">Explore and understand your emotions</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('mindfulColoring')">
+                    <div class="activity-card" data-item-id="mindfulColoring" onclick="openActivity('mindfulColoring')">
                         <i class="fas fa-palette"></i>
                         <h3 data-lang-key="activityColoringTitle">Mindful Coloring</h3>
                         <span class="favorite-icon" data-item-id="mindfulColoring" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityColoringDesc">Engage your senses with creative coloring</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('positiveAffirmations')">
+                    <div class="activity-card" data-item-id="positiveAffirmations" onclick="openActivity('positiveAffirmations')">
                         <i class="fas fa-comment-dots"></i>
                         <h3 data-lang-key="activityAffirmationsTitle">Positive Affirmations</h3>
                         <span class="favorite-icon" data-item-id="positiveAffirmations" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityAffirmationsDesc">Cultivate a positive mindset with affirmations</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('mindfulStorytelling')">
+                    <div class="activity-card" data-item-id="mindfulStorytelling" onclick="openActivity('mindfulStorytelling')">
                         <i class="fas fa-book-open"></i>
                         <h3 data-lang-key="activityStorytellingTitle">Mindful Storytelling</h3>
                         <span class="favorite-icon" data-item-id="mindfulStorytelling" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityStorytellingDesc">Create or listen to stories with focused attention</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('mindfulMovements')">
-                        <i class="fas fa-street-view"></i>
+                    <div class="activity-card" data-item-id="mindfulMovements" onclick="openActivity('mindfulMovements')">
+                        <i class="fas fa-person-walking-luggage"></i> 
                         <h3 data-lang-key="activityMovementsTitle">Mindful Movements</h3>
                         <span class="favorite-icon" data-item-id="mindfulMovements" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityMovementsDesc">Gentle stretches and movements to connect with your body</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('sensoryAwareness')">
-                        <i class="fas fa-hand-paper"></i>
+                    <div class="activity-card" data-item-id="sensoryAwareness" onclick="openActivity('sensoryAwareness')">
+                        <i class="fas fa-hand-sparkles"></i> 
                         <h3 data-lang-key="activitySensoryTitle">Sensory Awareness</h3>
                         <span class="favorite-icon" data-item-id="sensoryAwareness" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activitySensoryDesc">Explore the world around you by focusing on one sense at a time</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('natureObservation')">
+                    <div class="activity-card" data-item-id="natureObservation" onclick="openActivity('natureObservation')">
                         <i class="fas fa-leaf"></i>
                         <h3 data-lang-key="activityNatureTitle">Nature Observation</h3>
                         <span class="favorite-icon" data-item-id="natureObservation" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityNatureDesc">Connect with the natural world by observing plants, animals, or the sky</p>
                     </div>
-                    <div class="activity-card" onclick="openActivity('kindnessReflection')">
-                        <i class="fas fa-heart"></i>
+                    <div class="activity-card" data-item-id="kindnessReflection" onclick="openActivity('kindnessReflection')">
+                        <i class="fas fa-hands-holding-heart"></i> 
                         <h3 data-lang-key="activityKindnessTitle">Kindness Reflection</h3>
                         <span class="favorite-icon" data-item-id="kindnessReflection" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityKindnessDesc">Reflect on acts of kindness, given and received</p>
@@ -174,21 +178,34 @@
                 </div>
             </section>
 
-            <section id="about" class="about-section">
-                <h2 data-lang-key="aboutTitle">About Mindful Journey</h2>
-                <p data-lang-key="aboutText">Mindful Journey is an initiative by Brain Power to bring mindfulness and wellness education to students and adults in Japan. Based on the Mindfulness in Schools Project (MiSP), our platform provides guided practices and resources for developing mindfulness skills.</p>
+            <section id="favorites" class="favorites-section">
+                <h2 data-lang-key="favoritesTitle">My Favorites</h2>
+                <div id="favorite-practices-container">
+                    <h3 data-lang-key="favoritePracticesSubtitle" class="favorites-subtitle">Favorite Practices</h3>
+                    <div class="practice-grid" id="favorite-practice-grid">
+                        <p class="empty-favorites-message" data-lang-key="noFavoritePractices">No favorite practices yet.</p>
+                    </div>
+                </div>
+                <div id="favorite-activities-container" style="margin-top: 3rem;">
+                    <h3 data-lang-key="favoriteActivitiesSubtitle" class="favorites-subtitle">Favorite Activities</h3>
+                    <div class="activity-grid" id="favorite-activity-grid">
+                        <p class="empty-favorites-message" data-lang-key="noFavoriteActivities">No favorite activities yet.</p>
+                    </div>
+                </div>
             </section>
+
         </main>
 
         <div id="practice-modal" class="modal">
             <div class="modal-content">
-                <span class="close practice-close">&times;</span>
+                <span class="close practice-close">×</span>
                 <h3 id="practice-title" data-lang-key="practiceModalTitlePlaceholder">Practice Title</h3>
                 <p id="practice-description" data-lang-key="practiceModalDescPlaceholder">Practice description will appear here.</p>
                 <audio id="practice-audio" controls style="width: 100%; margin-top: 15px;">
-                    <source src="" type="audio/mpeg">
+                    <source type="audio/mpeg"> <!-- Removed src="" -->
                     Your browser does not support the audio element.
                 </audio>
+                <div id="audio-progress-display" class="audio-progress-text">00:00 / 00:00</div>
                 <div style="text-align: center; margin-top: 15px;">
                     <span class="favorite-icon practice-favorite-icon" data-item-category="practice" role="button" aria-label="Add to favorites" tabindex="0">
                         <i class="far fa-heart"></i>
@@ -198,12 +215,12 @@
         </div>
 
         <footer>
-            <p data-lang-key="footerText">&copy; 2025 Brain Power Mindfulness & Wellness</p>
+            <p data-lang-key="footerText">© 2025 Brain Power Mindfulness & Wellness</p>
         </footer>
     </div>
     <div id="affirmation-modal" class="modal">
         <div class="modal-content affirmation-modal-content">
-            <span class="close affirmation-close">&times;</span>
+            <span class="close affirmation-close">×</span>
             <h3 data-lang-key="affirmationPopupTitle">Your Daily Affirmation</h3>
             <p id="affirmation-text"></p>
             <span class="favorite-icon affirmation-favorite-icon" data-item-id="" data-item-category="affirmation" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
@@ -212,14 +229,15 @@
 
     <div id="activity-modal" class="modal">
         <div class="modal-content activity-modal-content">
-            <span class="close activity-close">&times;</span>
+            <span class="close activity-close">×</span>
             <h3 id="activity-title" data-lang-key="activityModalTitlePlaceholder">Activity Title</h3>
             <div id="activity-content">
-                <!-- Activity-specific content will be loaded here -->
                 <p data-lang-key="activityModalContentPlaceholder">Activity content will appear here.</p>
             </div>
         </div>
     </div>
+
+    <div id="feedback-message"></div>
 
     <script src="translations.js"></script>
     <script src="Mindful Journey.js"></script>

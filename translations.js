@@ -4,11 +4,13 @@ const translations = {
         navHome: "Home",
         navPractices: "Practices",
         navStudentZone: "Student Zone",
-        navAbout: "About",
+        navFavorites: "Favorites",
         navDailyAffirmation: "Daily Affirmation",
         // Hero
         heroTitle: "Welcome to Mindful Journey",
-        heroSubtitle: "Your personal guide to mindfulness and wellness",
+        heroSubtitle: "Embark on a personal journey of self-discovery and well-being. This space is designed for your self-guided practice in mindfulness and emotional awareness.",
+        homeIntroPara1: "Here, you'll find a collection of guided practices and interactive activities to help you cultivate presence, manage stress, and enhance your overall well-being. Whether you have a few minutes or a longer period, there's something to support your mindful moment.",
+        homeIntroPara2: "Explore breathing exercises, body scans, mindful movement, gratitude journaling, and more – all at your own pace. This is your personal sanctuary for quiet reflection and growth. Take a deep breath, and let's begin.",
         heroButton: "Start Your Practice",
         // Practices Section
         practicesTitle: "Guided Practices",
@@ -57,7 +59,7 @@ const translations = {
         mySavedAffirmationsTitle: "My Saved Affirmations:",
         affirmationEmptyAlert: "Please write an affirmation.",
         affirmationExistsAlert: "This affirmation is already saved.",
-        affirmationSavedAlert: "Affirmation saved!",
+        affirmationSavedSuccess: "Affirmation saved!", // Changed from affirmationSavedAlert
         noSavedAffirmations: "You haven't saved any affirmations yet.",
         activityMovementsTitle: "Mindful Movements",
         activityMovementsDesc: "Gentle stretches and movements to connect with your body",
@@ -97,36 +99,36 @@ const translations = {
         kindnessReflectionPrompt3: "Consider small, everyday acts of kindness. These can be as simple as a smile, holding a door, or offering help.",
         kindnessReflectionPrompt4: "How can you bring a little more kindness into your day today, for yourself or for others?",
         kindnessReflectionOutro: "Reflecting on kindness can help us appreciate it more and inspire us to be kinder.",
-        // About Section
-        aboutTitle: "About Mindful Journey",
-        aboutText: "Mindful Journey is an initiative by Brain Power to bring mindfulness and wellness education to students and adults in Japan. Based on the Mindfulness in Schools Project (MiSP), our platform provides guided practices and resources for developing mindfulness skills.",
+        favoritesTitle: "My Favorites",
+        favoritePracticesSubtitle: "Favorite Practices",
+        favoriteActivitiesSubtitle: "Favorite Activities",
+        noFavoritePractices: "You haven't favorited any practices yet.",
+        noFavoriteActivities: "You haven't favorited any activities yet.",
         // Footer
         footerText: "&copy; 2025 Brain Power Mindfulness & Wellness",
-        // Modal Titles (will need to be dynamic in app.js for practice/activity specific titles)
-        // General
         logoText: "Mindful Journey",
         addToFavorites: "Add to favorites",
         removeFromFavorites: "Remove from favorites",
-
-        // Modal Generic
         modalCloseButton: "Close",
         modalAudioPlayerTitle: "Guided Audio:",
         modalEndPracticeButton: "End Practice",
-        modalStartActivityButton: "Start Activity", // Already exists, but good to group
+        modalStartActivityButton: "Start Activity",
         affirmationPopupTitle: "Your Daily Affirmation",
-        activityModalTitlePlaceholder: "Activity",
-        activityModalContentPlaceholder: "Activity content will appear here.",
+        activityModalTitlePlaceholder: "Activity", 
+        activityModalContentPlaceholder: "Activity content will appear here.", 
         gratitudeJournalPrompt: "Take a few moments to write down three things you are grateful for today.",
         gratitudeJournalPlaceholder: "Type here...",
-        gratitudeJournalEmptyAlert: "Please write something before saving.",
-        gratitudeJournalSavedAlert: "Entry saved! (Logged to console for now)",
+        gratitudeJournalEmptyAlert: "Please write something you are grateful for.",
+        gratitudeJournalSavedSuccess: "Gratitude entry saved!", // Changed from gratitudeJournalSavedAlert
+        pastGratitudeEntriesTitle: "Your Past Gratitude Entries:",
+        noGratitudeEntriesYet: "You haven't saved any gratitude entries yet.",
         saveButtonText: "Save Entry",
         mindfulDrawingPrompt: "Find a piece of paper and something to draw with. Focus on the sensation of drawing, the lines, and the colors. Let your creativity flow without judgment.",
         mindfulDrawingTip: "There's no right or wrong way to do this, just enjoy the process!",
-
-        // Modal Specific Content
+        mindfulDrawingOnlineToolsPrompt: "Here are some online drawing tools you can explore:",
+        mindfulColoringPrintablesPrompt: "Here are some links to printable coloring pages:",
+        generalError: "An error occurred. Please try again.",
         modalContent: {
-            // --- Guided Practices ---
             breathing: {
                 title: "Focus on Breathing",
                 introduction: "This practice helps you anchor your attention to your breath, a constant and calming presence.",
@@ -267,81 +269,77 @@ const translations = {
                     "Listen to the entire piece with this focused awareness."
                 ]
             },
-
-            // --- Student Zone Activities ---
-            gratitudeJournal: {
-                title: "Gratitude Journal",
+            gratitudeJournal: { 
+                title: "Gratitude Journal", 
                 introduction: "Take a few moments to reflect on and write down things you are grateful for today.",
                 prompt: "What are three things you are grateful for today?",
                 placeholder: "1. ...\n2. ...\n3. ...",
                 saveButton: "Save Entry"
             },
-            mindfulDrawing: {
+            mindfulDrawing: { 
                 title: "Mindful Drawing",
                 introduction: "Engage your senses and focus on the present moment as you create a drawing. There's no right or wrong way to do it.",
                 prompt: "Start drawing whatever comes to mind. Focus on the sensation of the pen or pencil on the paper, the colors you choose, and the shapes that emerge. Let go of any judgment.",
                 canvasPlaceholder: "Your drawing area. (Note: Actual drawing canvas functionality is not implemented in this text-based version.)"
             },
             mindfulListening: {
-                title: "Mindful Listening Activity",
+                title: "Mindful Listening Activity", 
                 introduction: "This activity helps you practice focused listening. An audio clip will play. Try to notice as many different sounds as you can.",
                 prompt: "Listen carefully to the sounds. What do you hear?",
                 afterAudioPrompt: "What sounds did you notice? You can list them or just reflect internally.",
                 audioPlayerLabel: "Listen to the soundscape:"
             },
             emotionCheckIn: {
-                title: "Emotion Check-In",
+                title: "Emotion Check-In", 
                 introduction: "Take a moment to notice and name how you're feeling right now, without judgment.",
-                prompt: "How are you feeling right now? (e.g., happy, sad, calm, anxious, excited, tired)",
-                inputPlaceholder: "Type your feeling(s) here...",
-                reflectionPrompt: "Where do you feel this emotion in your body? What does it feel like?",
+                prompt: "How are you feeling right now? (e.g., happy, sad, calm, anxious, excited, tired)", 
                 detailedInputLabel: "Share more about how you're feeling:",
                 detailedInputPlaceholder: "Write your thoughts and feelings here...",
+                reflectionPrompt: "Where do you feel this emotion in your body? What does it feel like?",
                 saveButtonText: "Save Check-in",
-                checkInSavedAlert: "Your emotional check-in has been saved.",
+                checkInSavedSuccess: "Your emotional check-in has been saved.", // Changed
                 emptyTextareaAlert: "Please write something before saving.",
                 savedCheckInsTitle: "Your Past Check-ins:",
                 noCheckInsYet: "You haven't saved any check-ins yet."
             },
             mindfulColoring: {
-                title: "Mindful Coloring",
+                title: "Mindful Coloring", 
                 introduction: "Engage your senses by focusing on the act of coloring. Choose colors that appeal to you and notice the sensation of applying them.",
                 prompt: "Select a coloring page (imagine one here!) and begin coloring. Pay attention to the colors, the movement of your hand, and the texture of the page.",
                 coloringPagePlaceholder: "Imagine a beautiful coloring page here. (Note: Actual coloring functionality is not implemented in this text-based version.)"
             },
             positiveAffirmations: {
-                title: "Positive Affirmations",
+                title: "Positive Affirmations", 
                 introduction: "Affirmations are positive statements that can help you challenge and overcome self-sabotaging and negative thoughts. Repeat them to yourself, believing in their power.",
                 prompt: "Choose an affirmation below, or create your own. Repeat it silently or aloud several times, focusing on its meaning.",
-                affirmationsList: [
+                affirmationsList: [ 
                     "I am capable and strong.",
                     "I choose to be happy and grateful today.",
-                    "I am learning and growing every day.",
-                    "I treat myself with kindness and respect.",
-                    "I can overcome challenges."
+                    "I am learning and growing every day."
                 ],
-                customAffirmationPrompt: "Or, write your own positive affirmation:"
+                customAffirmationPrompt: "Or, write your own positive affirmation:" 
             },
             mindfulStorytelling: {
-                title: "Mindful Storytelling",
+                title: "Mindful Storytelling", 
                 introduction: "Engage your imagination and focus by creating or listening to a story with mindful attention.",
-                promptCreate: "Think of a simple story. It could be about your day, a dream, or something entirely made up. Focus on the details as you tell it (even if just to yourself).",
-                promptListen: "If listening to a story (imagine an audio player here), pay close attention to the words, the tone of voice, and the images that form in your mind. If your mind wanders, gently bring it back.",
+                promptCreate: "Create a Story: Think of a simple story. It could be about your day, a dream, or something entirely made up. Focus on the details as you tell it (even if just to yourself).",
+                promptListen: "Listen to a Story: If listening to a story (imagine an audio player here), pay close attention to the words, the tone of voice, and the images that form in your mind. If your mind wanders, gently bring it back.",
                 storyPlaceholder: "Start writing your story here, or imagine listening to one..."
             }
         }
-
     },
     ja: {
         // Nav
         navHome: "ホーム",
         navPractices: "実践",
         navStudentZone: "生徒ゾーン",
-        navAbout: "概要",
+        navFavorites: "お気に入り",
         navDailyAffirmation: "今日のアファメーション",
         // Hero
         heroTitle: "マインドフルジャーニーへようこそ",
-        heroSubtitle: "マインドフルネスとウェルネスへのあなたの個人的なガイド",
+        heroSubtitle: "自己発見とウェルビーイングの個人的な旅に出かけましょう。このスペースは、マインドフルネスと感情認識の自己学習・自己実践のために設計されています。",
+        homeIntroPara1: "ここでは、プレゼンスを養い、ストレスを管理し、全体的なウェルビーイングを高めるのに役立つガイド付き実践やインタラクティブなアクティビティのコレクションを見つけることができます。数分でも、より長い時間でも、あなたのマインドフルな瞬間をサポートするものがあります。",
+        homeIntroPara2: "呼吸法、ボディスキャン、マインドフルムーブメント、感謝の日記などを自分のペースで探求しましょう。ここは、静かな内省と成長のためのあなたの個人的な聖域です。深呼吸して、始めましょう。",
         heroButton: "実践を始める",
         // Practices Section
         practicesTitle: "ガイド付き実践",
@@ -390,7 +388,7 @@ const translations = {
         mySavedAffirmationsTitle: "保存したアファメーション：",
         affirmationEmptyAlert: "アファメーションを記入してください。",
         affirmationExistsAlert: "このアファメーションは既に保存されています。",
-        affirmationSavedAlert: "アファメーションが保存されました！",
+        affirmationSavedSuccess: "アファメーションが保存されました！", // Changed
         noSavedAffirmations: "まだアファメーションを保存していません。",
         activityMovementsTitle: "マインドフルムーブメント",
         activityMovementsDesc: "身体とつながるための優しいストレッチと動き",
@@ -430,37 +428,36 @@ const translations = {
         kindnessReflectionPrompt3: "日常の小さな親切な行為を考えてみてください。これらは、笑顔、ドアを押さえること、または助けを申し出ることなど、簡単なものです。",
         kindnessReflectionPrompt4: "今日、自分自身または他の人のために、もう少し親切をどのようにあなたの生活にもたらすことができますか？",
         kindnessReflectionOutro: "親切を振り返ることは、私たちがそれをより感謝し、より親切になるように私たちを鼓舞するのに役立ちます。",
-        // About Section
-        aboutTitle: "マインドフルジャーニーについて",
-        aboutText: "マインドフルジャーニーは、日本の生徒と大人にマインドフルネスとウェルネス教育を提供するためのブレインパワーによるイニシアチブです。マインドフルネス・イン・スクール・プロジェクト（MiSP）に基づいて、私たちのプラットフォームはマインドフルネススキルを開発するためのガイド付き実践とリソースを提供します。",
+        favoritesTitle: "お気に入り",
+        favoritePracticesSubtitle: "お気に入りの実践",
+        favoriteActivitiesSubtitle: "お気に入りのアクティビティ",
+        noFavoritePractices: "お気に入りの実践はまだありません。",
+        noFavoriteActivities: "お気に入りのアクティビティはまだありません。",
         // Footer
         footerText: "&copy; 2025 ブレインパワー マインドフルネス & ウェルネス",
-// ... (rest of the code remains the same)
-        // Modal Titles (will need to be dynamic in app.js for practice/activity specific titles)
-        // General
         logoText: "マインドフルジャーニー",
         addToFavorites: "お気に入りに追加",
         removeFromFavorites: "お気に入りから削除",
-
-        // Modal Generic
         modalCloseButton: "閉じる",
         modalAudioPlayerTitle: "ガイド付き音声：",
         modalEndPracticeButton: "実践を終了",
-        modalStartActivityButton: "アクティビティを開始", // 既存だがグループ化のため
+        modalStartActivityButton: "アクティビティを開始",
         affirmationPopupTitle: "今日のアファメーション",
         activityModalTitlePlaceholder: "アクティビティ",
         activityModalContentPlaceholder: "アクティビティの内容はここに表示されます。",
         gratitudeJournalPrompt: "今日感謝していることを3つ書いてみましょう。",
         gratitudeJournalPlaceholder: "ここに記入してください…",
-        gratitudeJournalEmptyAlert: "保存する前に何か書いてください。",
-        gratitudeJournalSavedAlert: "エントリーが保存されました！（現時点ではコンソールにログが出力されます）",
+        gratitudeJournalEmptyAlert: "感謝していることを何か書いてください。",
+        gratitudeJournalSavedSuccess: "感謝のエントリーが保存されました！", // Changed
+        pastGratitudeEntriesTitle: "過去の感謝のエントリー:",
+        noGratitudeEntriesYet: "まだ感謝のエントリーを保存していません。",
         saveButtonText: "保存する",
         mindfulDrawingPrompt: "紙と描くものを用意しましょう。描く感覚、線、色に集中してください。判断せずに創造性を発揮しましょう。",
-        mindfulDrawingTip: "正しい方法も間違った方法もありません。プロセスを楽しんでください！", // Added comma here
-
-        // Modal Specific Content
+        mindfulDrawingTip: "正しい方法も間違った方法もありません。プロセスを楽しんでください！",
+        mindfulDrawingOnlineToolsPrompt: "探求できるオンライン描画ツールはこちらです：",
+        mindfulColoringPrintablesPrompt: "印刷可能な塗り絵ページのリンクはこちらです：",
+        generalError: "エラーが発生しました。もう一度お試しください。",
         modalContent: {
-            // --- Guided Practices ---
             breathing: {
                 title: "呼吸に集中する",
                 introduction: "この実践は、常に穏やかな存在である呼吸に注意を固定するのに役立ちます。",
@@ -601,8 +598,6 @@ const translations = {
                     "この集中した意識で作品全体を聴いてください。"
                 ]
             },
-
-            // --- Student Zone Activities ---
             gratitudeJournal: {
                 title: "感謝ジャーナル",
                 introduction: "今日感謝していることを振り返り、書き留めるために数分間取ってください。",
@@ -627,12 +622,11 @@ const translations = {
                 title: "感情チェックイン",
                 introduction: "判断せずに、今どのように感じているかに気づき、名前を付けるために少し時間を取ってください。",
                 prompt: "今どんな気分ですか？（例：幸せ、悲しい、穏やか、不安、興奮している、疲れている）",
-                inputPlaceholder: "ここにあなたの感情を入力してください...",
-                reflectionPrompt: "この感情を体のどこで感じますか？どんな感じがしますか？",
                 detailedInputLabel: "今の気持ちについて詳しく教えてください：",
                 detailedInputPlaceholder: "ここにあなたの考えや感情を書いてください…",
+                reflectionPrompt: "この感情を体のどこで感じますか？どんな感じがしますか？",
                 saveButtonText: "チェックインを保存",
-                checkInSavedAlert: "感情チェックインが保存されました。",
+                checkInSavedSuccess: "感情チェックインが保存されました。", // Changed
                 emptyTextareaAlert: "保存する前に何か書いてください。",
                 savedCheckInsTitle: "過去のチェックイン：",
                 noCheckInsYet: "まだチェックインを保存していません。"
@@ -650,53 +644,24 @@ const translations = {
                 affirmationsList: [
                     "私は有能で強いです。",
                     "私は今日、幸せで感謝することを選びます。",
-                    "私は毎日学び成長しています。",
-                    "私は自分自身を優しさと敬意を持って扱います。",
-                    "私は困難を乗り越えることができます。"
+                    "私は毎日学び成長しています。"
                 ],
                 customAffirmationPrompt: "または、独自のポジティブなアファメーションを書いてください："
             },
             mindfulStorytelling: {
                 title: "マインドフルストーリーテリング",
                 introduction: "マインドフルな注意を払って物語を作成したり聴いたりすることで、想像力を刺激し集中します。",
-                promptCreate: "簡単な物語を考えてください。それはあなたの一日、夢、または完全に作り話かもしれません。それを語るとき（たとえ自分自身にだけだとしても）、詳細に集中してください。",
-                promptListen: "物語を聴いている場合（ここにオーディオプレーヤーを想像してください）、言葉、声のトーン、心に浮かぶイメージに細心の注意を払ってください。心がさまようときは、優しくそれに戻してください。",
+                promptCreate: "物語を作成する：簡単な物語を考えてください。それはあなたの一日、夢、または完全に作り話かもしれません。それを語るとき（たとえ自分自身にだけだとしても）、詳細に集中してください。",
+                promptListen: "物語を聴く：物語を聴いている場合（ここにオーディオプレーヤーを想像してください）、言葉、声のトーン、心に浮かぶイメージに細心の注意を払ってください。心がさまようときは、優しくそれに戻してください。",
                 storyPlaceholder: "ここにあなたの物語を書き始めるか、聴いているのを想像してください..."
             }
         }
-
     },
-    affirmations: [
+    affirmations: [ 
         { en: "I am capable of amazing things.", ja: "私には素晴らしいことができる。" },
         { en: "I choose to be happy today.", ja: "私は今日、幸せであることを選びます。" },
         { en: "I am strong and resilient.", ja: "私は強く、立ち直る力がある。" },
         { en: "I embrace new beginnings.", ja: "私は新しい始まりを受け入れます。" },
-        { en: "I am worthy of love and joy.", ja: "私は愛と喜びに値する。" },
-        { en: "I trust the journey of my life.", ja: "私は自分の人生の旅を信頼します。" },
-        { en: "I am grateful for all that I have.", ja: "私は持っているすべてのものに感謝しています。" },
-        { en: "I radiate positivity.", ja: "私はポジティブさを放ちます。" },
-        { en: "I am calm and at peace.", ja: "私は穏やかで平和です。" },
-        { en: "I believe in myself.", ja: "私は自分自身を信じています。" },
-        { en: "Every day is a fresh start.", ja: "毎日が新しいスタートです。" },
-        { en: "I am surrounded by abundance.", ja: "私は豊かさに囲まれています。" },
-        { en: "I am a magnet for miracles.", ja: "私は奇跡を引き寄せる磁石です。" },
-        { en: "I am confident in my abilities.", ja: "私は自分の能力に自信を持っています。" },
-        { en: "I attract positive energy.", ja: "私はポジティブなエネルギーを引き寄せます。" },
-        { en: "I am enough.", ja: "私はこれで十分です。" },
-        { en: "I am proud of who I am becoming.", ja: "私はなりつつある自分を誇りに思います。" },
-        { en: "I can overcome any challenge.", ja: "私はどんな挑戦も乗り越えられます。" },
-        { en: "My potential is limitless.", ja: "私の可能性は無限です。" },
-        { en: "I am creating the life of my dreams.", ja: "私は夢の人生を創造しています。" },
-        { en: "I am open to receiving all good things.", ja: "私はすべての良いものを受け入れる準備ができています。" },
-        { en: "I am a source of inspiration to others.", ja: "私は他の人々にとってインスピレーションの源です。" },
-        { en: "I am filled with energy and vitality.", ja: "私はエネルギーと活力に満ちています。" },
-        { en: "I make a positive difference in the world.", ja: "私は世界にポジティブな変化をもたらします。" },
-        { en: "I am at peace with my past.", ja: "私は自分の過去と和解しています。" },
-        { en: "I look forward to a bright future.", ja: "私は明るい未来を楽しみにしています。" },
-        { en: "I am kind to myself and others.", ja: "私は自分自身と他の人に親切です。" },
-        { en: "I am a work in progress, and that's okay.", ja: "私は成長過程にあり、それで大丈夫です。" },
-        { en: "I choose courage over fear.", ja: "私は恐れよりも勇気を選びます。" },
-        { en: "I am exactly where I need to be.", ja: "私はまさにいるべき場所にいます。" }
-        // Add more affirmations here to ensure a large pool
+        { en: "I am worthy of love and joy.", ja: "私は愛と喜びに値する。" }
     ]
 };

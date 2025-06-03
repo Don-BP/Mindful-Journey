@@ -5,12 +5,18 @@
     --background-color: #f5f6fa;
     --text-color: #2c3e50;
     --card-background: #ffffff;
+    --button-active-scale: 0.97; 
+    --card-active-scale: 0.98;   
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
@@ -50,19 +56,35 @@ nav {
 .nav-links {
     display: flex;
     list-style: none;
-    gap: 2rem;
+    gap: 1.2rem; /* Adjusted gap for new link */
 }
 
 .nav-links a {
     text-decoration: none;
     color: var(--text-color);
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, transform 0.1s ease, background-color 0.2s ease;
+    display: inline-block; 
+    padding: 0.25rem 0.5rem; 
+    border-radius: 4px; 
 }
 
-.nav-links a:hover, .nav-links a.active {
+.nav-links a:hover {
     color: var(--primary-color);
+    background-color: #e9ecef; 
 }
+.nav-links a.active {
+    color: var(--primary-color);
+    font-weight: bold;
+    background-color: #ddeeff; /* Light blue background for active */
+}
+
+
+.nav-links a:active {
+    transform: scale(var(--button-active-scale));
+    color: #357abd; 
+}
+
 
 .lang-button {
     background-color: var(--primary-color);
@@ -72,50 +94,93 @@ nav {
     border-radius: 5px;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-left: 1rem; /* Add some space from nav links */
+    transition: background-color 0.3s ease, transform 0.15s ease;
+    margin-left: 1rem; 
 }
 
 .lang-button:hover {
     background-color: #357abd;
 }
 
+.lang-button:active {
+    background-color: #2a6ca4; 
+    transform: scale(var(--button-active-scale));
+}
+
 main {
     padding: 2rem 0;
 }
 
-.hero {
-    text-align: center;
-    padding: 4rem 0;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    border-radius: 10px;
-    margin-bottom: 2rem;
+main > section {
+    display: none; 
+    padding: 2rem 0; /* Adjusted common padding slightly */
 }
+main > section.current-section {
+    display: block; 
+}
+
+
+.hero { 
+    padding: 3rem 1rem; /* Adjusted padding */
+    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); /* Softer gradient */
+    border-radius: 10px;
+    text-align: center; /* Ensure hero content is centered */
+}
+main > section#home.current-section {
+    margin-bottom: 0; 
+}
+
 
 .hero h1 {
     font-size: 2.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem; /* Reduced margin */
     color: var(--secondary-color);
 }
+
+.hero .hero-subtitle-main {
+    font-size: 1.15rem;
+    color: #555;
+    max-width: 700px; /* Limit width for better readability */
+    margin: 0 auto 1.5rem auto; /* Center and add margin */
+    line-height: 1.7;
+}
+
+.home-intro-text {
+    max-width: 750px;
+    margin: 1.5rem auto 2rem auto; /* Center and add margin */
+    text-align: left; /* Align paragraphs to the left for readability */
+    font-size: 1.05rem;
+    color: var(--text-color);
+}
+
+.home-intro-text p {
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
 
 .cta-button {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 1rem 2rem;
+    padding: 0.9rem 1.8rem; /* Slightly adjusted padding */
     border-radius: 5px;
     font-size: 1.1rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.15s ease;
+    display: inline-block; /* Ensures it respects text-align of parent for centering */
+    margin-top: 1rem; /* Added some space above the button */
 }
 
 .cta-button:hover {
     background-color: #357abd;
 }
 
-.practices-section, .student-zone, .about-section {
-    padding: 3rem 0;
+.cta-button:active {
+    background-color: #2a6ca4; 
+    transform: scale(var(--button-active-scale));
 }
+
 
 .practice-grid, .activity-grid {
     display: grid;
@@ -131,12 +196,21 @@ main {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     text-align: center;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease; 
+    border: 2px solid transparent; 
+    position: relative; 
+    padding-top: 40px; 
 }
 
 .practice-card:hover, .activity-card:hover {
     transform: translateY(-5px);
 }
+
+.practice-card:active, .activity-card:active {
+    transform: translateY(-2px) scale(var(--card-active-scale)); 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); 
+}
+
 
 .practice-card i, .activity-card i {
     font-size: 2.5rem;
@@ -144,14 +218,33 @@ main {
     margin-bottom: 1rem;
 }
 
-h2 {
+h2 { 
     text-align: center;
     margin-bottom: 2rem;
     color: var(--secondary-color);
+    font-size: 2rem;
 }
 
+.favorites-subtitle { 
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--secondary-color);
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.empty-favorites-message, 
+.empty-entries-message { /* Style for new empty states as well */
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    padding: 1rem 0; /* Adjusted padding */
+    grid-column: 1 / -1; /* For grid layouts */
+}
+
+
 .modal {
-    display: none; /* JS changes to 'flex' to show */
+    display: none; 
     position: fixed;
     top: 0;
     left: 0;
@@ -159,20 +252,19 @@ h2 {
     height: 100%;
     background-color: rgba(0,0,0,0.5);
     z-index: 1001;
-    align-items: center; /* Added for centering */
-    justify-content: center; /* Added for centering */
+    align-items: center; 
+    justify-content: center; 
 }
 
 .modal-content {
     background-color: var(--card-background);
-    /* margin: 15% auto; */ /* Removed for flex centering */
     padding: 2rem;
     width: 90%;
     max-width: 600px;
     border-radius: 10px;
     position: relative;
-    max-height: 85vh; /* Added */
-    overflow-y: auto; /* Added */
+    max-height: 85vh; 
+    overflow-y: auto; 
 }
 
 .close {
@@ -181,11 +273,22 @@ h2 {
     top: 0.5rem;
     font-size: 1.5rem;
     cursor: pointer;
+    color: #aaa; 
+    transition: color 0.2s ease, transform 0.15s ease;
+    padding: 0.25rem; 
+    line-height: 1; 
 }
+.close:hover {
+    color: var(--accent-color); 
+}
+.close:active {
+    color: #c0392b; 
+    transform: scale(0.9);
+}
+
 
 .affirmation-modal-content {
     background-color: #fefefe;
-    margin: 15% auto;
     padding: 30px;
     border: 1px solid #888;
     width: 80%;
@@ -193,43 +296,52 @@ h2 {
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative; 
+    max-height: 85vh;
+    overflow-y: auto;
 }
 
 #affirmation-text {
     font-size: 1.2em;
     margin-top: 20px;
-    min-height: 50px; /* Ensure space for text */
+    min-height: 50px; 
 }
 
 .favorite-icon {
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 1.5rem; /* Adjust size as needed */
-    color: #ccc; /* Default empty heart color */
+    font-size: 1.5rem; 
+    color: #ccc; 
     cursor: pointer;
     transition: color 0.3s ease, transform 0.2s ease;
+    padding: 5px; 
 }
 
 .favorite-icon:hover {
-    color: #ff8a80; /* Light red on hover */
+    color: #ff8a80; 
     transform: scale(1.1);
 }
 
+.favorite-icon:active {
+    transform: scale(0.95); 
+    color: #ff4081; 
+}
+
 .favorite-icon.favorited .fa-heart::before {
-    content: "\f004"; /* Font Awesome solid heart character */
-    font-weight: 900; /* Ensure solid heart is used */
-    color: #ff4081; /* Filled heart color (e.g., pink/red) */
+    content: "\f004"; 
+    font-weight: 900; 
+    color: #ff4081; 
 }
 
 .affirmation-modal-content .favorite-icon {
-    top: 15px; /* Example adjustment */
-    right: 40px; /* Next to the close button */
+    top: 15px; 
+    right: 40px; 
 }
 
 .favorite-icon .fa-heart {
     font-family: "Font Awesome 6 Free";
-    font-weight: 400; /* Regular weight for empty heart */
+    font-weight: 400; 
 }
 
 .activity-action-button {
@@ -243,8 +355,8 @@ h2 {
     font-size: 1rem;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 10px; /* Add some space above the button */
+    transition: background-color 0.3s ease, transform 0.15s ease;
+    margin-top: 10px; 
 }
 
 .activity-action-button:hover {
@@ -253,76 +365,136 @@ h2 {
 }
 
 .activity-action-button:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(var(--button-active-scale)); 
+    background-color: #1e2b37; 
 }
 
-.affirmation-close {
-    color: #aaa;
-    float: right;
+.affirmation-close { 
+    position: absolute; 
+    right: 15px;
+    top: 10px;
     font-size: 28px;
     font-weight: bold;
 }
 
-.affirmation-close:hover,
-.affirmation-close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+.practice-modal .favorite-icon { 
+    top: 15px; 
+    right: 15px;
 }
 
-/* Favorite Icon Styles */
-.favorite-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 1.5rem; /* Adjust size as needed */
-    color: #ccc; /* Default empty heart color */
-    cursor: pointer;
-    transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.favorite-icon:hover {
-    color: #ff8a80; /* Light red on hover */
-    transform: scale(1.1);
-}
-
-.favorite-icon.favorited .fa-heart::before {
-    content: "\f004"; /* Font Awesome solid heart character */
-    font-weight: 900; /* Ensure solid heart is used */
-    color: #ff4081; /* Filled heart color (e.g., pink/red) */
-}
-
-/* Adjust positioning for affirmation modal favorite icon if needed */
 .affirmation-modal-content .favorite-icon {
-    top: 15px; /* Example adjustment */
-    right: 40px; /* Next to the close button */
+    top: 15px; 
+    right: 45px; 
 }
 
-/* Ensure practice and activity cards are positioned relatively for absolute positioning of icon */
-.practice-card,
-.activity-card {
-    position: relative;
-    padding-top: 40px; /* Add some padding to the top if icons overlap content */
+
+.practice-card.current-item,
+.activity-card.current-item {
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 12px rgba(74, 144, 226, 0.6); 
+    transform: translateY(-3px); 
 }
 
-/* Ensure Font Awesome regular (far) is loaded for empty heart by default */
-.favorite-icon .fa-heart {
-    font-family: "Font Awesome 6 Free";
-    font-weight: 400; /* Regular weight for empty heart */
+.practice-card.current-item:active,
+.activity-card.current-item:active {
+    transform: translateY(-3px) scale(var(--card-active-scale)); 
 }
 
+.audio-progress-text {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: var(--secondary-color);
+    min-height: 1.2em; 
+}
+
+/* Feedback Message Styles */
+#feedback-message {
+    position: fixed;
+    bottom: -50px; /* Start off-screen */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 25px;
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out, bottom 0.4s ease-in-out;
+    visibility: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+#feedback-message.show {
+    opacity: 1;
+    bottom: 30px; 
+    visibility: visible;
+}
+
+#feedback-message.success {
+    background-color: #28a745; /* Green */
+}
+
+#feedback-message.error {
+    background-color: #dc3545; /* Red */
+}
+#feedback-message.info {
+    background-color: var(--primary-color); /* Blue for general info */
+}
+
+.past-entries-list {
+    list-style-type: none; 
+    padding-left: 0;
+    max-height: 200px; /* Example max height */
+    overflow-y: auto;
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+.past-entries-list li {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.past-entries-list li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+.past-entries-list strong {
+    display: block;
+    font-size: 0.9em;
+    color: var(--secondary-color);
+    margin-bottom: 3px;
+}
 
 
 @media (max-width: 768px) {
     .nav-links {
-        display: none;
+        gap: 0.5rem; 
+        flex-wrap: wrap; 
+        justify-content: center;
+    }
+    .nav-links a {
+        font-size: 0.85rem; /* Further reduced for smaller screens */
+         padding: 0.2rem 0.3rem;
     }
     
     .hero h1 {
         font-size: 2rem;
     }
+    .hero .hero-subtitle-main, .home-intro-text {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
     
     .practice-grid, .activity-grid {
         grid-template-columns: 1fr;
+    }
+
+    #feedback-message {
+        width: 90%;
+        text-align: center;
     }
 }

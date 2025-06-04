@@ -267,7 +267,7 @@ const setLanguage = (lang) => {
     });
     const langSwitcherButton = document.getElementById('lang-switcher');
     if (langSwitcherButton) {
-        langSwitcherButton.textContent = lang === 'en' ? 'JA' : 'EN';
+        langSwitcherButton.textContent = lang === 'en' ? '日本語' : 'EN';
     }
 
     const affirmationModalInstance = document.getElementById('affirmation-modal');

@@ -15,7 +15,7 @@
     box-sizing: border-box;
 }
 
-html {
+html { /* Added for smooth scrolling */
     scroll-behavior: smooth;
 }
 
@@ -56,7 +56,7 @@ nav {
 .nav-links {
     display: flex;
     list-style: none;
-    gap: 1.2rem; /* Adjusted gap for new link */
+    gap: 1.2rem; 
 }
 
 .nav-links a {
@@ -76,7 +76,7 @@ nav {
 .nav-links a.active {
     color: var(--primary-color);
     font-weight: bold;
-    background-color: #ddeeff; /* Light blue background for active */
+    background-color: #ddeeff; 
 }
 
 
@@ -113,7 +113,7 @@ main {
 
 main > section {
     display: none; 
-    padding: 2rem 0; /* Adjusted common padding slightly */
+    padding: 2rem 0; 
 }
 main > section.current-section {
     display: block; 
@@ -121,10 +121,10 @@ main > section.current-section {
 
 
 .hero { 
-    padding: 3rem 1rem; /* Adjusted padding */
-    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); /* Softer gradient */
+    padding: 3rem 1rem; 
+    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); 
     border-radius: 10px;
-    text-align: center; /* Ensure hero content is centered */
+    text-align: center; 
 }
 main > section#home.current-section {
     margin-bottom: 0; 
@@ -133,22 +133,22 @@ main > section#home.current-section {
 
 .hero h1 {
     font-size: 2.5rem;
-    margin-bottom: 0.75rem; /* Reduced margin */
+    margin-bottom: 0.75rem; 
     color: var(--secondary-color);
 }
 
 .hero .hero-subtitle-main {
     font-size: 1.15rem;
     color: #555;
-    max-width: 700px; /* Limit width for better readability */
-    margin: 0 auto 1.5rem auto; /* Center and add margin */
+    max-width: 700px; 
+    margin: 0 auto 1.5rem auto; 
     line-height: 1.7;
 }
 
 .home-intro-text {
     max-width: 750px;
-    margin: 1.5rem auto 2rem auto; /* Center and add margin */
-    text-align: left; /* Align paragraphs to the left for readability */
+    margin: 1.5rem auto 2rem auto; 
+    text-align: left; 
     font-size: 1.05rem;
     color: var(--text-color);
 }
@@ -163,13 +163,13 @@ main > section#home.current-section {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 0.9rem 1.8rem; /* Slightly adjusted padding */
+    padding: 0.9rem 1.8rem; 
     border-radius: 5px;
     font-size: 1.1rem;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.15s ease;
-    display: inline-block; /* Ensures it respects text-align of parent for centering */
-    margin-top: 1rem; /* Added some space above the button */
+    display: inline-block; 
+    margin-top: 1rem; 
 }
 
 .cta-button:hover {
@@ -234,12 +234,12 @@ h2 {
 }
 
 .empty-favorites-message, 
-.empty-entries-message { /* Style for new empty states as well */
+.empty-entries-message { 
     text-align: center;
     color: #777;
     font-style: italic;
-    padding: 1rem 0; /* Adjusted padding */
-    grid-column: 1 / -1; /* For grid layouts */
+    padding: 1rem 0; 
+    grid-column: 1 / -1; 
 }
 
 
@@ -411,7 +411,7 @@ h2 {
 /* Feedback Message Styles */
 #feedback-message {
     position: fixed;
-    bottom: -50px; /* Start off-screen */
+    bottom: -50px; 
     left: 50%;
     transform: translateX(-50%);
     padding: 12px 25px;
@@ -433,20 +433,20 @@ h2 {
 }
 
 #feedback-message.success {
-    background-color: #28a745; /* Green */
+    background-color: #28a745; 
 }
 
 #feedback-message.error {
-    background-color: #dc3545; /* Red */
+    background-color: #dc3545; 
 }
 #feedback-message.info {
-    background-color: var(--primary-color); /* Blue for general info */
+    background-color: var(--primary-color); 
 }
 
 .past-entries-list {
     list-style-type: none; 
     padding-left: 0;
-    max-height: 200px; /* Example max height */
+    max-height: 200px; 
     overflow-y: auto;
     border: 1px solid #eee;
     padding: 10px;
@@ -477,7 +477,7 @@ h2 {
         justify-content: center;
     }
     .nav-links a {
-        font-size: 0.85rem; /* Further reduced for smaller screens */
+        font-size: 0.85rem; 
          padding: 0.2rem 0.3rem;
     }
     

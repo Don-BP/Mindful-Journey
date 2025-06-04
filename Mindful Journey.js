@@ -130,13 +130,11 @@ function showFeedbackMessage(message, type = 'success', duration = 3000) {
 
     feedbackTimeout = setTimeout(() => {
         feedbackElement.classList.remove('show');
-        // Wait for fade out before removing type class, or remove it immediately
-        // For simplicity, remove type class after hiding
         setTimeout(() => {
              if (!feedbackElement.classList.contains('show')) {
-                feedbackElement.className = ''; // Clear all classes if not shown
+                feedbackElement.className = ''; 
              }
-        }, 500); // Match transition duration
+        }, 500); 
     }, duration);
 }
 
@@ -293,19 +291,18 @@ const setLanguage = (lang) => {
     if (favoritesSection && favoritesSection.classList.contains('current-section')) {
         displayFavoritesPage();
     }
-    // Re-render content in open modals if language changes
     const activityModal = document.getElementById('activity-modal');
     if (activityModal.style.display === 'flex') {
         const currentActivityType = activityModal.dataset.currentActivityType;
         if (currentActivityType) {
-            openActivity(currentActivityType, true); // Re-open/refresh content
+            openActivity(currentActivityType, true); 
         }
     }
     const practiceModal = document.getElementById('practice-modal');
     if (practiceModal.style.display === 'flex') {
         const currentPracticeType = practiceModal.dataset.currentPracticeType;
         if (currentPracticeType) {
-            startPractice(currentPracticeType, true); // Re-open/refresh content
+            startPractice(currentPracticeType, true); 
         }
     }
 };
@@ -328,7 +325,9 @@ function showSection(targetId) {
         }
     });
     if (targetSection) {
-        window.scrollTo({ top: targetSection.offsetTop - document.querySelector('header').offsetHeight - 10 , behavior: 'smooth' });
+        // Adjust scroll to account for sticky header height
+        const headerHeight = document.querySelector('header')?.offsetHeight || 0;
+        window.scrollTo({ top: targetSection.offsetTop - headerHeight - 10 , behavior: 'smooth' });
     }
 }
 
@@ -486,6 +485,57 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Hamburger Menu Logic
+    const hamburgerButton = document.getElementById('hamburger-menu');
+    const navLinks = document.querySelector('.nav-links');
+    const mainElement = document.querySelector('main'); 
+
+    if (hamburgerButton && navLinks) {
+        hamburgerButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent click from immediately closing via mainElement listener
+            navLinks.classList.toggle('mobile-nav-active');
+            const isExpanded = navLinks.classList.contains('mobile-nav-active');
+            hamburgerButton.setAttribute('aria-expanded', isExpanded);
+            const icon = hamburgerButton.querySelector('i');
+            if (isExpanded) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+                document.body.classList.add('mobile-nav-open');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+                document.body.classList.remove('mobile-nav-open');
+            }
+        });
+
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navLinks.classList.contains('mobile-nav-active')) {
+                    navLinks.classList.remove('mobile-nav-active');
+                    hamburgerButton.setAttribute('aria-expanded', 'false');
+                    const icon = hamburgerButton.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                    document.body.classList.remove('mobile-nav-open');
+                }
+            });
+        });
+
+        // Close menu if clicked outside on main content or header (but not on nav itself)
+        document.addEventListener('click', (event) => {
+            if (navLinks.classList.contains('mobile-nav-active') && 
+                !navLinks.contains(event.target) && 
+                !hamburgerButton.contains(event.target)) {
+                    navLinks.classList.remove('mobile-nav-active');
+                    hamburgerButton.setAttribute('aria-expanded', 'false');
+                    const icon = hamburgerButton.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                    document.body.classList.remove('mobile-nav-open');
+            }
+        });
+    }
 }); 
 
 
@@ -604,7 +654,7 @@ function displayFavoritesPage() {
     }
     
     if (!hasFavPractices) {
-        if (noFavPracticesMsg) { // Check if the template message exists
+        if (noFavPracticesMsg) { 
             noFavPracticesMsg.style.display = 'block';
             favPracticesGrid.appendChild(noFavPracticesMsg);
         }
@@ -625,7 +675,7 @@ function displayFavoritesPage() {
     }
 
     if (!hasFavActivities) {
-        if (noFavActivitiesMsg) { // Check if the template message exists
+        if (noFavActivitiesMsg) { 
             noFavActivitiesMsg.style.display = 'block';
             favActivitiesGrid.appendChild(noFavActivitiesMsg);
         }
@@ -645,7 +695,7 @@ function openActivity(type, isRefresh = false) {
         return;
     }
     
-    if (!isRefresh) { // Only clear indicator and set card if not a language refresh
+    if (!isRefresh) { 
         clearCurrentActivityIndicator(); 
         const activityCard = document.querySelector(`.activity-card[data-item-id="${type}"]`);
         if (activityCard) {
@@ -653,7 +703,7 @@ function openActivity(type, isRefresh = false) {
             currentlyActiveCardElement = activityCard;
         }
     }
-    modal.dataset.currentActivityType = type; // Store for language refresh
+    modal.dataset.currentActivityType = type; 
 
     let activityTitleKey = `activity${type.charAt(0).toUpperCase() + type.slice(1)}Title`; 
     titleElement.textContent = translations[currentLanguage]?.[activityTitleKey] || translations[currentLanguage]?.activityModalTitlePlaceholder || type;
@@ -807,7 +857,7 @@ function openActivity(type, isRefresh = false) {
                     <ul>
                         <li><a href="https://www.justcolor.net/mandalas/" target="_blank" rel="noopener noreferrer">Just Color - Mandalas</a></li>
                         <li><a href="https://www.crayola.com/free-coloring-pages/adult-coloring-pages/" target="_blank" rel="noopener noreferrer">Crayola - Adult Coloring Pages</a></li>
-                        <li><a href="https://www.itsybitsyfun.com/free-printable-coloring-pages-for-kids-and-adults/" target="_blank" rel="noopener noreferrer">Itsy Bitsy Fun - Coloring Pages</a></li>
+                        <li><a href="https://www.itsybitsyfun.com/coloring-pages.html" target="_blank" rel="noopener noreferrer">Itsy Bitsy Fun - Coloring Pages</a></li>
                     </ul>
                 </div>
             `;
@@ -920,7 +970,7 @@ function displayUserAffirmations() {
     if (userAffirmations.length === 0) {
         const li = document.createElement('li');
         li.textContent = translations[currentLanguage]?.noSavedAffirmations || "You haven't saved any affirmations yet.";
-        li.className = 'empty-entries-message'; // Use a common class for styling
+        li.className = 'empty-entries-message'; 
         ul.appendChild(li);
     } else {
         userAffirmations.forEach(affirmation => {
@@ -966,7 +1016,7 @@ function displayGratitudeEntries() {
         li.className = 'empty-entries-message';
         listElement.appendChild(li);
     } else {
-        gratitudeEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Show newest first
+        gratitudeEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); 
 
         gratitudeEntries.forEach(entry => {
             const li = document.createElement('li');
@@ -1051,7 +1101,7 @@ function startPractice(practiceType, isRefresh = false) {
         return;
     }
     const modal = document.getElementById('practice-modal');
-    if (!isRefresh) { // Only clear indicator and set card if not a language refresh
+    if (!isRefresh) { 
         clearCurrentActivityIndicator(); 
         const practiceCard = document.querySelector(`.practice-card[data-item-id="${practiceType}"]`);
         if (practiceCard) {
@@ -1059,7 +1109,7 @@ function startPractice(practiceType, isRefresh = false) {
             currentlyActiveCardElement = practiceCard;
         }
     }
-    modal.dataset.currentPracticeType = practiceType; // Store for language refresh
+    modal.dataset.currentPracticeType = practiceType; 
 
 
     const { titleKey, simpleDescriptionKey, audioFileBase, modalContentKey } = practiceDetails;
@@ -1101,7 +1151,7 @@ function startPractice(practiceType, isRefresh = false) {
     }
     
     const langSpecificAudioFile = `audio/${currentLanguage}/${audioFileBase}`;
-    audioSourceElement.src = langSpecificAudioFile;
+    if (audioSourceElement) audioSourceElement.src = langSpecificAudioFile; // Check if source element exists
     audioElement.load(); 
     
     const onLoadedMetadata = () => {

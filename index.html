@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-lang-key="pageTitle">Mindful Journey - Guided Mindfulness & Wellness App</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
@@ -152,7 +152,7 @@
                         <p data-lang-key="activityStorytellingDesc">Create or listen to stories with focused attention</p>
                     </div>
                     <div class="activity-card" data-item-id="mindfulMovements" onclick="openActivity('mindfulMovements')">
-                        <i class="fas fa-person-walking-luggage"></i> 
+                        <i class="fas fa-child-reaching"></i> 
                         <h3 data-lang-key="activityMovementsTitle">Mindful Movements</h3>
                         <span class="favorite-icon" data-item-id="mindfulMovements" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityMovementsDesc">Gentle stretches and movements to connect with your body</p>
@@ -170,7 +170,8 @@
                         <p data-lang-key="activityNatureDesc">Connect with the natural world by observing plants, animals, or the sky</p>
                     </div>
                     <div class="activity-card" data-item-id="kindnessReflection" onclick="openActivity('kindnessReflection')">
-                        <i class="fas fa-hands-holding-heart"></i> 
+                        <!-- Changed icon class here -->
+                        <i class="fas fa-gift"></i> 
                         <h3 data-lang-key="activityKindnessTitle">Kindness Reflection</h3>
                         <span class="favorite-icon" data-item-id="kindnessReflection" data-item-category="activity" role="button" aria-label="Add to favorites" tabindex="0"><i class="far fa-heart"></i></span>
                         <p data-lang-key="activityKindnessDesc">Reflect on acts of kindness, given and received</p>
@@ -202,7 +203,7 @@
                 <h3 id="practice-title" data-lang-key="practiceModalTitlePlaceholder">Practice Title</h3>
                 <p id="practice-description" data-lang-key="practiceModalDescPlaceholder">Practice description will appear here.</p>
                 <audio id="practice-audio" controls style="width: 100%; margin-top: 15px;">
-                    <source type="audio/mpeg"> <!-- Removed src="" -->
+                    <source type="audio/mpeg"> 
                     Your browser does not support the audio element.
                 </audio>
                 <div id="audio-progress-display" class="audio-progress-text">00:00 / 00:00</div>

@@ -1,13 +1,60 @@
 :root {
+    /* Light Theme (Default) */
     --primary-color: #4a90e2;
     --secondary-color: #2c3e50;
     --accent-color: #e74c3c;
     --background-color: #f5f6fa;
     --text-color: #2c3e50;
     --card-background: #ffffff;
+    --modal-background: #ffffff;
+    --hero-gradient-start: #f0f4f8;
+    --hero-gradient-end: #d9e2ec;
+    --hero-subtitle-color: #555;
+    --border-color: #eee;
+    --empty-message-color: #777;
+    --button-hover-bg: #357abd;
+    --button-active-bg: #2a6ca4;
+    --nav-link-hover-bg: #e9ecef;
+    --nav-link-active-bg: #ddeeff;
+    --shadow-color: rgba(0,0,0,0.1);
+    --card-shadow-hover-color: rgba(0,0,0,0.15);
+    --close-button-color: #aaa;
+    --close-button-hover-color: var(--accent-color);
+    --focus-ring-color: color-mix(in srgb, var(--primary-color) 30%, transparent); 
+    --canvas-border-color: #ccc;
+
+
+    /* Shared */
     --button-active-scale: 0.97; 
     --card-active-scale: 0.98;   
 }
+
+body.dark-mode {
+    /* Dark Theme Overrides */
+    --primary-color: #58a6ff; 
+    --secondary-color: #c9d1d9; 
+    --accent-color: #f85149; 
+    --background-color: #0d1117; 
+    --text-color: #c9d1d9; 
+    --card-background: #161b22; 
+    --modal-background: #1e242c; 
+    --hero-gradient-start: #101b2e; 
+    --hero-gradient-end: #0d1117;
+    --hero-subtitle-color: #8b949e; 
+    --border-color: #30363d; 
+    --empty-message-color: #8b949e;
+    --button-hover-bg: #4895e0;
+    --button-active-bg: #3a7cc4;
+    --nav-link-hover-bg: #21262d;
+    --nav-link-active-bg: #1f6feb;
+    --shadow-color: rgba(0,0,0,0.3); 
+    --card-shadow-hover-color: rgba(0,0,0,0.4);
+    --close-button-color: #888;
+    --close-button-hover-color: var(--accent-color);
+    --focus-ring-color: color-mix(in srgb, var(--primary-color) 40%, transparent); 
+    --canvas-border-color: #444;
+}
+
 
 * {
     margin: 0;
@@ -24,6 +71,7 @@ body {
     line-height: 1.6;
     color: var(--text-color);
     background-color: var(--background-color);
+    transition: background-color 0.3s ease, color 0.3s ease; 
 }
 body.mobile-nav-open { 
     overflow: hidden;
@@ -37,11 +85,12 @@ body.mobile-nav-open {
 }
 
 header {
-    background-color: var(--card-background);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: var(--card-background); 
+    box-shadow: 0 2px 5px var(--shadow-color); 
     position: sticky;
     top: 0;
     z-index: 1000;
+    transition: background-color 0.3s ease;
 }
 
 nav {
@@ -55,14 +104,14 @@ nav {
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--primary-color);
+    color: var(--primary-color); 
 }
 
 .hamburger-button {
     display: none; 
     background: none;
     border: none;
-    color: var(--text-color);
+    color: var(--text-color); 
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0.5rem;
@@ -71,13 +120,15 @@ nav {
 
 .nav-links {
     display: flex; 
+    align-items: center; 
     list-style: none;
     gap: 1.2rem; 
+    margin-left: auto; 
 }
 
 .nav-links a {
     text-decoration: none;
-    color: var(--text-color);
+    color: var(--text-color); 
     font-weight: 500;
     transition: color 0.3s ease, transform 0.1s ease, background-color 0.2s ease;
     display: inline-block; 
@@ -86,19 +137,54 @@ nav {
 }
 
 .nav-links a:hover {
-    color: var(--primary-color);
-    background-color: #e9ecef; 
+    color: var(--primary-color); 
+    background-color: var(--nav-link-hover-bg); 
 }
 .nav-links a.active {
-    color: var(--primary-color);
+    color: var(--primary-color); 
     font-weight: bold;
-    background-color: #ddeeff; 
+    background-color: var(--nav-link-active-bg); 
 }
-
 
 .nav-links a:active {
     transform: scale(var(--button-active-scale));
-    color: #357abd; 
+    color: var(--button-active-bg); 
+}
+
+.nav-links .nav-item-theme-switcher {
+    margin-left: 0.5rem; 
+    padding: 0;
+    border: none;
+    display: flex; 
+    align-items: center;
+}
+.nav-links .nav-item-theme-switcher:hover {
+    background-color: transparent;
+}
+
+#theme-switcher { 
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 0.8rem; 
+    border-radius: 5px;
+    font-size: 0.9rem; 
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1; 
+}
+#theme-switcher:hover {
+    background-color: var(--button-hover-bg);
+}
+#theme-switcher:active {
+    background-color: var(--button-active-bg);
+    transform: scale(var(--button-active-scale));
+}
+#theme-switcher i {
+    font-size: inherit; 
 }
 
 
@@ -111,15 +197,15 @@ nav {
     font-size: 0.9rem;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.15s ease;
-    margin-left: 1rem; 
+    margin-left: 0.5rem; 
 }
 
 .lang-button:hover {
-    background-color: #357abd;
+    background-color: var(--button-hover-bg); 
 }
 
 .lang-button:active {
-    background-color: #2a6ca4; 
+    background-color: var(--button-active-bg); 
     transform: scale(var(--button-active-scale));
 }
 
@@ -138,9 +224,10 @@ main > section.current-section {
 
 .hero { 
     padding: 3rem 1rem; 
-    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); 
+    background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%); 
     border-radius: 10px;
     text-align: center; 
+    transition: background 0.3s ease;
 }
 main > section#home.current-section {
     margin-bottom: 0; 
@@ -150,12 +237,12 @@ main > section#home.current-section {
 .hero h1 {
     font-size: 2.5rem;
     margin-bottom: 0.75rem; 
-    color: var(--secondary-color);
+    color: var(--secondary-color); 
 }
 
 .hero .hero-subtitle-main {
     font-size: 1.15rem;
-    color: #555;
+    color: var(--hero-subtitle-color); 
     max-width: 700px; 
     margin: 0 auto 1.5rem auto; 
     line-height: 1.7;
@@ -166,7 +253,7 @@ main > section#home.current-section {
     margin: 1.5rem auto 2rem auto; 
     text-align: left; 
     font-size: 1.05rem;
-    color: var(--text-color);
+    color: var(--text-color); 
 }
 
 .home-intro-text p {
@@ -176,7 +263,7 @@ main > section#home.current-section {
 
 
 .cta-button {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color); 
     color: white;
     border: none;
     padding: 0.9rem 1.8rem; 
@@ -189,11 +276,11 @@ main > section#home.current-section {
 }
 
 .cta-button:hover {
-    background-color: #357abd;
+    background-color: var(--button-hover-bg); 
 }
 
 .cta-button:active {
-    background-color: #2a6ca4; 
+    background-color: var(--button-active-bg); 
     transform: scale(var(--button-active-scale));
 }
 
@@ -206,13 +293,13 @@ main > section#home.current-section {
 }
 
 .practice-card, .activity-card {
-    background-color: var(--card-background);
+    background-color: var(--card-background); 
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px var(--shadow-color); 
     text-align: center;
     cursor: pointer;
-    transition: transform 0.3s ease, border 0.3s ease, box-shadow 0.3s ease; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
     border: 2px solid transparent; 
     position: relative; 
     padding-top: 40px; 
@@ -220,31 +307,37 @@ main > section#home.current-section {
 
 .practice-card:hover, .activity-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 6px 12px var(--card-shadow-hover-color); 
 }
 
 .practice-card:active, .activity-card:active {
     transform: translateY(-2px) scale(var(--card-active-scale)); 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08); 
+    box-shadow: 0 1px 3px var(--shadow-color); 
 }
 
 
 .practice-card i, .activity-card i {
     font-size: 2.5rem;
-    color: var(--primary-color);
+    color: var(--primary-color); 
     margin-bottom: 1rem;
 }
+.practice-card h3, .activity-card h3, 
+.modal-content h3 { 
+    color: var(--secondary-color); 
+}
+
 
 h2 { 
     text-align: center;
     margin-bottom: 2rem;
-    color: var(--secondary-color);
+    color: var(--secondary-color); 
     font-size: 2rem;
 }
 
 .favorites-subtitle { 
     text-align: center;
     margin-bottom: 1.5rem;
-    color: var(--secondary-color);
+    color: var(--secondary-color); 
     font-size: 1.5rem;
     font-weight: 600;
 }
@@ -252,28 +345,36 @@ h2 {
 .empty-favorites-message, 
 .empty-entries-message { 
     text-align: center;
-    color: #777;
+    color: var(--empty-message-color); 
     font-style: italic;
     padding: 1rem 0; 
     grid-column: 1 / -1; 
 }
 
-
 .modal {
-    display: none; 
+    display: flex;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.6); 
     z-index: 1001;
     align-items: center; 
     justify-content: center; 
+    opacity: 0; 
+    visibility: hidden; 
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s; 
+}
+
+.modal.show {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0s; 
 }
 
 .modal-content {
-    background-color: var(--card-background);
+    background-color: var(--modal-background); 
     padding: 2rem;
     width: 90%;
     max-width: 600px;
@@ -281,7 +382,17 @@ h2 {
     position: relative;
     max-height: 85vh; 
     overflow-y: auto; 
+    color: var(--text-color); 
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    transform: translateY(30px) scale(0.95); 
+    opacity: 0; 
 }
+
+.modal.show .modal-content { 
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
 
 .close {
     position: absolute;
@@ -289,29 +400,27 @@ h2 {
     top: 0.5rem;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #aaa; 
+    color: var(--close-button-color); 
     transition: color 0.2s ease, transform 0.15s ease;
     padding: 0.25rem; 
     line-height: 1; 
 }
 .close:hover {
-    color: var(--accent-color); 
+    color: var(--close-button-hover-color); 
 }
 .close:active {
-    color: #c0392b; 
+    color: var(--accent-color); 
     transform: scale(0.9);
 }
 
-
-.affirmation-modal-content {
-    background-color: #fefefe;
+.affirmation-modal-content { 
     padding: 30px;
-    border: 1px solid #888;
+    border: 1px solid var(--border-color); 
     width: 80%;
     max-width: 500px;
     border-radius: 10px;
     text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px var(--shadow-color); 
     position: relative; 
     max-height: 85vh;
     overflow-y: auto;
@@ -321,6 +430,7 @@ h2 {
     font-size: 1.2em;
     margin-top: 20px;
     min-height: 50px; 
+    color: var(--text-color); 
 }
 
 .favorite-icon {
@@ -328,22 +438,19 @@ h2 {
     top: 10px;
     right: 10px;
     font-size: 1.5rem; 
-    color: #ccc; 
+    color: var(--empty-message-color); 
     cursor: pointer;
     transition: color 0.3s ease, transform 0.2s ease;
     padding: 5px; 
 }
-
 .favorite-icon:hover {
     color: #ff8a80; 
     transform: scale(1.1);
 }
-
 .favorite-icon:active {
     transform: scale(0.95); 
     color: #ff4081; 
 }
-
 .favorite-icon.favorited .fa-heart::before {
     content: "\f004"; 
     font-weight: 900; 
@@ -360,8 +467,33 @@ h2 {
     font-weight: 400; 
 }
 
+button:focus-visible,
+a:focus-visible,
+textarea:focus-visible,
+input[type="text"]:focus-visible, 
+input[type="color"]:focus-visible, 
+input[type="range"]:focus-visible, 
+audio:focus-visible { 
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px; 
+    box-shadow: 0 0 0 4px var(--focus-ring-color); 
+    border-radius: 3px; 
+}
+
+.hamburger-button:focus-visible,
+#theme-switcher:focus-visible,
+.close:focus-visible,
+.favorite-icon:focus-visible {
+    border-radius: 4px; 
+}
+
+audio:focus {
+    outline: none;
+}
+
+
 .activity-action-button {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color); 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -374,10 +506,12 @@ h2 {
     transition: background-color 0.3s ease, transform 0.15s ease;
     margin-top: 10px; 
 }
-
 .activity-action-button:hover {
-    background-color: var(--secondary-color);
+    background-color: var(--secondary-color); 
     transform: translateY(-2px);
+}
+body.dark-mode .activity-action-button:hover { 
+    background-color: #30363d; 
 }
 
 .activity-action-button:active {
@@ -406,8 +540,8 @@ h2 {
 
 .practice-card.current-item,
 .activity-card.current-item {
-    border: 2px solid var(--primary-color);
-    box-shadow: 0 0 12px rgba(74, 144, 226, 0.6); 
+    border: 2px solid var(--primary-color); 
+    box-shadow: 0 0 12px color-mix(in srgb, var(--primary-color) 60%, transparent); 
     transform: translateY(-3px); 
 }
 
@@ -420,13 +554,13 @@ h2 {
     text-align: center;
     margin-top: 8px;
     font-size: 0.9em;
-    color: var(--secondary-color);
+    color: var(--secondary-color); 
     min-height: 1.2em; 
 }
 
 #feedback-message {
     position: fixed;
-    bottom: -50px; 
+    bottom: -70px; 
     left: 50%;
     transform: translateX(-50%);
     padding: 12px 25px;
@@ -438,7 +572,7 @@ h2 {
     opacity: 0;
     transition: opacity 0.4s ease-in-out, bottom 0.4s ease-in-out;
     visibility: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 10px var(--shadow-color); 
 }
 
 #feedback-message.show {
@@ -463,15 +597,16 @@ h2 {
     padding-left: 0;
     max-height: 200px; 
     overflow-y: auto;
-    border: 1px solid #eee;
+    border: 1px solid var(--border-color); 
     padding: 10px;
     border-radius: 5px;
     margin-top: 10px;
+    background-color: var(--background-color); 
 }
 .past-entries-list li {
     margin-bottom: 10px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-color); 
 }
 .past-entries-list li:last-child {
     border-bottom: none;
@@ -480,8 +615,252 @@ h2 {
 .past-entries-list strong {
     display: block;
     font-size: 0.9em;
-    color: var(--secondary-color);
+    color: var(--secondary-color); 
     margin-bottom: 3px;
+}
+audio {
+    filter: invert(0); 
+}
+body.dark-mode audio {
+    filter: invert(1) hue-rotate(180deg); 
+}
+
+.journal-prompt-container {
+    margin-bottom: 15px; 
+    padding: 10px;
+    border: 1px dashed var(--border-color);
+    border-radius: 5px;
+    background-color: color-mix(in srgb, var(--card-background) 90%, var(--background-color)); 
+}
+
+.journal-prompt-title {
+    font-weight: 500;
+    color: var(--secondary-color);
+    font-size: 0.95em;
+    margin-bottom: 5px;
+}
+
+.journal-prompt-text {
+    font-style: italic;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    min-height: 1.5em; 
+}
+
+.journal-prompt-button {
+    background-color: var(--background-color); 
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 5px 10px;
+    font-size: 0.8em;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.journal-prompt-button:hover {
+    background-color: var(--nav-link-hover-bg);
+    border-color: var(--primary-color);
+}
+.journal-prompt-button:focus-visible { 
+    outline: 2px solid var(--primary-color);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 3px var(--focus-ring-color);
+}
+
+.affirmation-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0; 
+}
+
+.affirmation-text-item {
+    flex-grow: 1; 
+    margin-right: 10px; 
+    word-break: break-word; 
+}
+
+.affirmation-item-controls {
+    display: flex;
+    gap: 8px; 
+    flex-shrink: 0; 
+}
+
+.affirmation-edit-button,
+.affirmation-delete-button {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 4px 8px;
+    font-size: 0.8em;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    display: inline-flex; 
+    align-items: center;
+}
+.affirmation-edit-button i, 
+.affirmation-delete-button i {
+    margin-right: 4px;
+}
+
+.affirmation-edit-button:hover {
+    background-color: var(--nav-link-hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.affirmation-delete-button:hover {
+    background-color: color-mix(in srgb, var(--accent-color) 15%, transparent);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+/* Drawing Canvas Styles */
+#mindful-drawing-canvas {
+    border: 1px solid var(--canvas-border-color);
+    cursor: crosshair;
+    touch-action: none; 
+    max-width: 100%; 
+    display: block; 
+    margin: 0 auto; 
+}
+
+.drawing-controls {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: var(--background-color);
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+}
+.drawing-controls > div { 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.drawing-controls label {
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+.drawing-controls input[type="color"] {
+    width: 40px;
+    height: 30px;
+    border: 1px solid var(--border-color);
+    padding: 0; 
+    border-radius: 4px;
+    cursor: pointer;
+}
+.drawing-controls input[type="range"] {
+    width: 100px; 
+    cursor: pointer;
+}
+#drawing-brush-size-value {
+    min-width: 30px; 
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+/* Coloring Page Styles */
+.coloring-page-selector {
+    margin-bottom: 20px;
+    text-align: center;
+}
+.coloring-page-selector p { /* Label: "Choose an image..." */
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+.coloring-thumbs-grid { /* Container for the thumbnails */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+.coloring-page-thumb {
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    min-width: 100px; /* Give some base width */
+}
+.coloring-page-thumb i {
+    font-size: 1.5rem; /* Icon size for thumb */
+    color: var(--primary-color);
+}
+.coloring-page-thumb span {
+    font-size: 0.85rem;
+}
+.coloring-page-thumb:hover {
+    background-color: var(--nav-link-hover-bg);
+    border-color: var(--primary-color);
+}
+
+.coloring-page-canvas-area {
+    width: 100%;
+    max-width: 500px; 
+    margin: 0 auto 15px auto;
+    border: 1px solid var(--canvas-border-color);
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    min-height: 200px; 
+    background-color: var(--card-background); /* So it's visible if SVG is transparent */
+}
+.coloring-page-canvas-area svg { 
+    max-width: 100%;
+    max-height: 400px; 
+    display: block;
+}
+.coloring-page-canvas-area svg path:not([fill="none"]):not([fill="transparent"]) { /* Target fillable paths */
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+.coloring-page-canvas-area svg path:not([fill="none"]):not([fill="transparent"]):hover {
+    opacity: 0.7;
+}
+
+
+.coloring-palette-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px; /* Smaller gap for color swatches */
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: var(--background-color);
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+}
+.color-palette-button {
+    width: 28px; /* Slightly smaller */
+    height: 28px;
+    border-radius: 50%; 
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    transition: transform 0.1s ease, border-color 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.color-palette-button:hover {
+    transform: scale(1.1);
+    border-color: var(--text-color);
+}
+.color-palette-button.active {
+    border-color: var(--primary-color);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px var(--primary-color); /* Outline effect for active */
 }
 
 
@@ -499,44 +878,75 @@ h2 {
     .hamburger-button {
         display: block; 
         order: 2; 
-    }
-
-    .lang-button {
-        order: 3; 
         margin-left: 0.5rem; 
-        font-size: 0.8rem; 
-        padding: 0.4rem 0.8rem;
+    }
+    
+    .lang-button { 
+        order: 3; 
+        margin-left: 0; 
+        padding: 0.4rem 0.7rem;
+        font-size: 0.8rem;
     }
 
-    .nav-links {
+    .nav-links { 
         display: none; 
         order: 4; 
         flex-direction: column;
-        align-items: center; 
+        align-items: stretch; 
         position: absolute;
         top: 100%; 
         left: 0;
         width: 100%;
         background-color: var(--card-background);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        padding: 1rem 0;
+        box-shadow: 0 4px 8px var(--shadow-color);
+        padding: 0; 
         z-index: 1000; 
-        gap: 0.5rem; 
+        gap: 0; 
     }
 
     .nav-links.mobile-nav-active {
         display: flex; 
     }
 
-    .nav-links a {
+    .nav-links li { 
+        width: 100%;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color); 
+    }
+    .nav-links li:last-child {
+        border-bottom: none; 
+    }
+
+    .nav-links li a { 
+        display: block; 
         font-size: 1rem; 
         padding: 0.75rem 1rem;
         width: 100%;
         text-align: center;
-        border-bottom: 1px solid #eee; 
+        color: var(--text-color); 
     }
-    .nav-links li:last-child a {
-        border-bottom: none; 
+     .nav-links li a:hover {
+        background-color: var(--nav-link-hover-bg);
+        color: var(--primary-color);
+    }
+
+    .nav-links .nav-item-theme-switcher {
+        margin-left: 0; 
+        display: flex; 
+        justify-content: center;
+    }
+    .nav-links .nav-item-theme-switcher #theme-switcher {
+        background-color: transparent; 
+        color: var(--text-color); 
+        border-radius: 0; 
+        font-size: 1rem; 
+        padding: 0.75rem 1rem; 
+        width: 100%; 
+        justify-content: center; 
+    }
+     .nav-links .nav-item-theme-switcher #theme-switcher:hover {
+        background-color: var(--nav-link-hover-bg);
+        color: var(--primary-color);
     }
     
     .hero h1 {
@@ -551,7 +961,6 @@ h2 {
     section#student-zone .activity-grid,
     section#favorites .practice-grid, 
     section#favorites .activity-grid {
-        /* Forcing two columns on tablet-sized screens */
         grid-template-columns: repeat(2, 1fr) !important; 
         gap: 1rem; 
     }
@@ -576,14 +985,58 @@ h2 {
         width: 90%;
         text-align: center;
     }
+
+    .affirmation-list-item {
+        flex-direction: column; 
+        align-items: flex-start;
+    }
+    .affirmation-item-controls {
+        margin-top: 8px;
+    }
+
+    .drawing-controls {
+        flex-direction: column;
+        align-items: stretch; 
+        gap: 10px;
+    }
+    .drawing-controls > div {
+        justify-content: space-between; 
+    }
+    .drawing-controls input[type="range"] {
+        flex-grow: 1; 
+    }
+    #drawing-clear-canvas {
+        width: 100%; 
+    }
+
+    .coloring-page-thumb {
+        padding: 8px 10px;
+        font-size: 0.9em;
+        min-width: 80px;
+    }
+    .coloring-thumbs-grid {
+        gap: 8px;
+    }
+    .color-palette-button {
+        width: 26px;
+        height: 26px;
+    }
+
 }
 
 @media (max-width: 480px) { 
+    .hamburger-button {
+        margin-left: 0.2rem; 
+    }
+    .lang-button {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
     section#practices .practice-grid,
     section#student-zone .activity-grid,
     section#favorites .practice-grid,
     section#favorites .activity-grid {
-        /* Explicitly one column for very small screens, overriding the auto-fit */
         grid-template-columns: 1fr; 
     }
 
@@ -604,11 +1057,11 @@ h2 {
     .hamburger-button {
         font-size: 1.3rem;
     }
-     #lang-switcher { 
-        font-size: 0.75rem;
-        padding: 0.3rem 0.6rem;
-    }
     .modal-content {
         padding: 1.5rem;
+    }
+
+    .drawing-controls input[type="range"] {
+        width: auto; /* Allow it to shrink more */
     }
 }

@@ -21,8 +21,14 @@
                     <li><a href="#student-zone" data-section-id="student-zone" data-lang-key="navStudentZone">Student Zone</a></li>
                     <li><a href="#favorites" id="nav-favorites-link" data-section-id="favorites" data-lang-key="navFavorites">Favorites</a></li>
                     <li><a href="#" id="daily-affirmation-link" class="nav-link-item" data-lang-key="navDailyAffirmation">Daily Affirmation</a></li>
+                    <li class="nav-item-theme-switcher"> <!-- Added wrapper for mobile -->
+                        <button id="theme-switcher" class="theme-button" aria-label="Switch to dark mode">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
                 </ul>
-                <button id="lang-switcher" class="lang-button">日本語</button>
+                <!-- Language switcher remains outside nav-links for desktop positioning -->
+                <button id="lang-switcher" class="lang-button">JA</button>
             </nav>
         </header>
 

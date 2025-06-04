@@ -3,7 +3,31 @@ let currentAffirmationObject = null;
 let userFavorites = {};
 let currentlyActiveCardElement = null; 
 let feedbackTimeout;
+let editingAffirmationIndex = null; 
 
+let drawingCanvas = null;
+let drawingCtx = null;
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+let currentBrushSize = 5;
+let currentColor = '#000000'; 
+
+const coloringPagesData = [
+    { id: 'dinosaurs', nameKey: 'coloringPageDinosaurs', svgFile: 'dinosaurs.svg' }, 
+    { id: 'school', nameKey: 'coloringPageSchool', svgFile: 'school.svg' },  
+    { id: 'fruit', nameKey: 'coloringPageFruit', svgFile: 'fruit.svg' },
+    { id: 'sweets', nameKey: 'coloringPageSweets', svgFile: 'sweets_treats.svg' },
+    { id: 'pets', nameKey: 'coloringPagePets', svgFile: 'cat_and_dog.svg' },
+    { id: 'ocean', nameKey: 'coloringPageOcean', svgFile: 'ocean_animals.svg' },
+    { id: 'food', nameKey: 'coloringPageFastFood', svgFile: 'fast_food.svg' },
+    { id: 'spacecat', nameKey: 'coloringPageSpaceCat', svgFile: 'space_cat.svg' },
+    { id: 'catrainbow', nameKey: 'coloringPageCatRainbow', svgFile: 'cat_rainbow.svg' },
+    { id: 'flowers', nameKey: 'coloringPageFlowers', svgFile: 'flowers.svg' },
+    { id: 'cactus', nameKey: 'coloringPageCactus', svgFile: 'cactus.svg' }
+];
+let selectedColoringPageSVGElement = null; // To hold the currently loaded SVG DOM element
+let currentColorForColoring = '#FF0000'; // Default coloring color (e.g., red)
 
 const allAffirmations = [
     { en: "Today is a brand new day, full of possibilities.", ja: "今日は可能性に満ちた、全く新しい一日です。" },
@@ -118,16 +142,67 @@ const practiceDataStore = {
     }
 };
 
+const gratitudePrompts = {
+    en: [
+        "What is one small thing that happened today that you're grateful for?",
+        "Who is someone you appreciate in your life and why?",
+        "What is a skill or talent you possess that you're thankful for?",
+        "Describe a place that makes you feel peaceful or happy.",
+        "What is something you learned recently that you're grateful for?",
+        "What challenge have you overcome that you can now be grateful for the experience of?",
+        "Think about a simple pleasure you enjoyed this week.",
+        "What aspect of nature are you grateful for today?",
+        "What is something about your home that you appreciate?",
+        "Acknowledge a personal quality you are proud of."
+    ],
+    ja: [
+        "今日あった小さなことで、感謝していることは何ですか？",
+        "あなたの人生で感謝している人は誰ですか？また、その理由は何ですか？",
+        "あなたが持っているスキルや才能で、感謝しているものは何ですか？",
+        "あなたを平和な気持ちにさせたり、幸せにさせたりする場所を説明してください。",
+        "最近学んだことで、感謝していることは何ですか？",
+        "乗り越えた困難で、今ではその経験に感謝できることは何ですか？",
+        "今週楽しんだささやかな喜びについて考えてみてください。",
+        "今日、自然のどんな側面に感謝していますか？",
+        "あなたの家について感謝していることは何ですか？",
+        "あなたが誇りに思っている自分の資質を認めてください。"
+    ]
+};
+
+const emotionPrompts = {
+    en: [
+        "What's the strongest emotion you're feeling right now? Where do you feel it in your body?",
+        "If your current emotion had a color, what would it be and why?",
+        "What might be a message this emotion is trying to tell you?",
+        "Can you recall a time you felt this way before? What was the situation?",
+        "How does this emotion affect your thoughts or actions right now?",
+        "What's one small thing you could do to acknowledge or care for this emotion?",
+        "Are there any underlying feelings beneath the most obvious one?",
+        "How intense is this emotion on a scale of 1 to 10?",
+        "If this emotion could speak, what would it say in one sentence?",
+        "What are you learning from feeling this way?"
+    ],
+    ja: [
+        "今感じている最も強い感情は何ですか？体のどこでそれを感じますか？",
+        "もし今の感情に色があったとしたら、何色で、それはなぜですか？",
+        "この感情があなたに伝えようとしているメッセージは何かもしれませんか？",
+        "以前にこのように感じた時のことを思い出せますか？どんな状況でしたか？",
+        "この感情は今、あなたの考えや行動にどのように影響していますか？",
+        "この感情を認めたり、ケアしたりするためにできる小さなことは何ですか？",
+        "最も明白な感情の下に、何か隠れた感情はありますか？",
+        "この感情の強さは1から10のスケールでどのくらいですか？",
+        "もしこの感情が話せるとしたら、一言で何を言いますか？",
+        "このように感じることから何を学んでいますか？"
+    ]
+};
+
 function showFeedbackMessage(message, type = 'success', duration = 3000) {
     const feedbackElement = document.getElementById('feedback-message');
     if (!feedbackElement) return;
-
     clearTimeout(feedbackTimeout); 
-
     feedbackElement.textContent = message;
     feedbackElement.className = 'show'; 
     feedbackElement.classList.add(type); 
-
     feedbackTimeout = setTimeout(() => {
         feedbackElement.classList.remove('show');
         setTimeout(() => {
@@ -137,7 +212,6 @@ function showFeedbackMessage(message, type = 'success', duration = 3000) {
         }, 500); 
     }, duration);
 }
-
 
 function formatTime(seconds) {
     if (isNaN(seconds) || seconds === Infinity) {
@@ -198,7 +272,6 @@ const toggleFavorite = (itemId, itemCategory, iconElement) => {
     if (!userFavorites[itemCategory]) {
         userFavorites[itemCategory] = [];
     }
-
     const itemIndex = userFavorites[itemCategory].indexOf(itemId);
     if (itemIndex > -1) {
         userFavorites[itemCategory].splice(itemIndex, 1);
@@ -207,7 +280,6 @@ const toggleFavorite = (itemId, itemCategory, iconElement) => {
     }
     saveFavorites();
     updateFavoriteIcon(iconElement, itemId, itemCategory);
-
     const favoritesSection = document.getElementById('favorites');
     if (favoritesSection && favoritesSection.classList.contains('current-section')) {
         displayFavoritesPage();
@@ -218,32 +290,22 @@ const initializeFavoriteIcons = () => {
     document.querySelectorAll('.favorite-icon').forEach(icon => {
         const newIcon = icon.cloneNode(true);
         icon.parentNode.replaceChild(newIcon, icon);
-        
         const itemId = newIcon.dataset.itemId;
         const itemCategory = newIcon.dataset.itemCategory;
-
         if (!itemId && (itemCategory === 'practice' || itemCategory === 'affirmation')) {
-            if (itemCategory === 'practice' && newIcon.closest('#practice-modal')) {
-            } else if (itemCategory === 'affirmation' && newIcon.closest('#affirmation-modal')) {
-            } else {
-            }
             return;
         }
-
         if (!itemId || !itemCategory) {
             console.warn('Favorite icon missing itemId or itemCategory:', newIcon);
             return; 
         }
-
         updateFavoriteIcon(newIcon, itemId, itemCategory);
-
         newIcon.addEventListener('click', (event) => {
             event.stopPropagation(); 
             event.preventDefault(); 
             const currentItemId = (itemCategory === 'affirmation' && currentAffirmationObject) ? currentAffirmationObject.en : newIcon.dataset.itemId;
             toggleFavorite(currentItemId, itemCategory, newIcon);
         });
-
         newIcon.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.stopPropagation();
@@ -255,7 +317,6 @@ const initializeFavoriteIcons = () => {
     });
 };
 
-
 const setLanguage = (lang) => {
     currentLanguage = lang;
     localStorage.setItem('appLanguage', lang);
@@ -263,15 +324,17 @@ const setLanguage = (lang) => {
         const key = element.getAttribute('data-lang-key');
         if (translations[lang] && translations[lang][key]) {
             element.innerHTML = translations[lang][key];
+        } else if (translations.en[key]) { 
+            element.innerHTML = translations.en[key];
         }
     });
     const langSwitcherButton = document.getElementById('lang-switcher');
     if (langSwitcherButton) {
-        langSwitcherButton.textContent = lang === 'en' ? '日本語' : 'EN';
+        langSwitcherButton.textContent = lang === 'en' ? 'JA' : 'EN';
     }
 
     const affirmationModalInstance = document.getElementById('affirmation-modal');
-    if (affirmationModalInstance && affirmationModalInstance.style.display === 'flex' && currentAffirmationObject) {
+    if (affirmationModalInstance.classList.contains('show') && currentAffirmationObject) {
         const affirmationTextElement = document.getElementById('affirmation-text');
         if (affirmationTextElement && currentAffirmationObject[lang]) {
             affirmationTextElement.textContent = currentAffirmationObject[lang];
@@ -292,19 +355,20 @@ const setLanguage = (lang) => {
         displayFavoritesPage();
     }
     const activityModal = document.getElementById('activity-modal');
-    if (activityModal.style.display === 'flex') {
+    if (activityModal.classList.contains('show')) {
         const currentActivityType = activityModal.dataset.currentActivityType;
         if (currentActivityType) {
             openActivity(currentActivityType, true); 
         }
     }
     const practiceModal = document.getElementById('practice-modal');
-    if (practiceModal.style.display === 'flex') {
+    if (practiceModal.classList.contains('show')) {
         const currentPracticeType = practiceModal.dataset.currentPracticeType;
         if (currentPracticeType) {
             startPractice(currentPracticeType, true); 
         }
     }
+    updateThemeButtonAriaLabel();
 };
 
 function showSection(targetId) {
@@ -325,9 +389,34 @@ function showSection(targetId) {
         }
     });
     if (targetSection) {
-        // Adjust scroll to account for sticky header height
         const headerHeight = document.querySelector('header')?.offsetHeight || 0;
         window.scrollTo({ top: targetSection.offsetTop - headerHeight - 10 , behavior: 'smooth' });
+    }
+}
+
+function setTheme(theme) {
+    const themeSwitcherButton = document.getElementById('theme-switcher');
+    const icon = themeSwitcherButton.querySelector('i');
+    if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    } else {
+        document.body.classList.remove('dark-mode');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+    }
+    localStorage.setItem('appTheme', theme);
+    updateThemeButtonAriaLabel();
+}
+
+function updateThemeButtonAriaLabel() {
+    const themeSwitcherButton = document.getElementById('theme-switcher');
+    if (!themeSwitcherButton) return; 
+    if (document.body.classList.contains('dark-mode')) {
+        themeSwitcherButton.setAttribute('aria-label', translations[currentLanguage]?.switchToLightMode || 'Switch to light mode');
+    } else {
+        themeSwitcherButton.setAttribute('aria-label', translations[currentLanguage]?.switchToDarkMode || 'Switch to dark mode');
     }
 }
 
@@ -343,6 +432,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const themeSwitcherButton = document.getElementById('theme-switcher');
+    if (themeSwitcherButton) {
+        themeSwitcherButton.addEventListener('click', () => {
+            const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+    }
+
+    const savedTheme = localStorage.getItem('appTheme') || 'light';
+    setTheme(savedTheme);
+
+
     document.querySelectorAll('.nav-links a[data-section-id]').forEach(link => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
@@ -355,7 +456,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     setLanguage(currentLanguage); 
     initializeFavoriteIcons(); 
-
     showSection('home'); 
 
     const dailyAffirmationLink = document.getElementById('daily-affirmation-link');
@@ -392,7 +492,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const affirmation = allAffirmations[newAffirmationIndex];
             affirmationTextElem.textContent = affirmation[currentLanguage];
             currentAffirmationObject = affirmation; 
-            affirmationModalInstance.style.display = 'flex';
+            affirmationModalInstance.classList.add('show');
+
 
             const affirmationFavoriteIcon = affirmationModalInstance.querySelector('.favorite-icon');
             if (affirmationFavoriteIcon) {
@@ -405,14 +506,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (affirmationCloseButton) {
         affirmationCloseButton.onclick = () => {
-            affirmationModal.style.display = 'none';
+            affirmationModal.classList.remove('show'); 
             currentAffirmationObject = null;
         };
     }
 
     window.addEventListener('click', (event) => {
         if (event.target === affirmationModal) {
-            affirmationModal.style.display = 'none';
+            affirmationModal.classList.remove('show'); 
             currentAffirmationObject = null;
         }
     });
@@ -423,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if(practiceCloseBtn) {
         practiceCloseBtn.onclick = () => {
-            practiceModal.style.display = 'none';
+            practiceModal.classList.remove('show'); 
             clearCurrentActivityIndicator();
             const audioElement = document.getElementById('practice-audio');
             if (audioElement) {
@@ -438,7 +539,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('click', (event) => { 
         if (event.target === practiceModal) {
-            practiceModal.style.display = 'none';
+            practiceModal.classList.remove('show'); 
             clearCurrentActivityIndicator(); 
             const audioElement = document.getElementById('practice-audio');
             if (audioElement) {
@@ -456,7 +557,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (activityCloseButton) {
         activityCloseButton.onclick = () => {
-            activityModal.style.display = 'none';
+            activityModal.classList.remove('show'); 
+            if (drawingCanvas) { 
+                removeDrawingEventListeners();
+                drawingCanvas = null;
+                drawingCtx = null;
+            }
+            // Reset coloring page UI if it was open
+            const coloringSelector = document.getElementById('coloring-page-selector');
+            const coloringCanvasArea = document.getElementById('coloring-page-canvas-area');
+            const coloringPalette = document.getElementById('coloring-palette-container');
+            const resetColoringBtn = document.getElementById('reset-coloring-button');
+            if (coloringSelector) coloringSelector.style.display = 'block'; // Show selector again
+            if (coloringCanvasArea) coloringCanvasArea.style.display = 'none';
+            if (coloringPalette) coloringPalette.style.display = 'none';
+            if (resetColoringBtn) resetColoringBtn.style.display = 'none';
+            selectedColoringPageSVGElement = null;
+
+
             clearCurrentActivityIndicator(); 
             const activityAudio = activityModal.querySelector('audio');
             if (activityAudio) {
@@ -472,7 +590,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('click', (event) => { 
         if (event.target === activityModal) {
-            activityModal.style.display = 'none';
+            activityModal.classList.remove('show'); 
+            if (drawingCanvas) { 
+                removeDrawingEventListeners();
+                drawingCanvas = null;
+                drawingCtx = null;
+            }
+            // Reset coloring page UI if it was open
+            const coloringSelector = document.getElementById('coloring-page-selector');
+            const coloringCanvasArea = document.getElementById('coloring-page-canvas-area');
+            const coloringPalette = document.getElementById('coloring-palette-container');
+            const resetColoringBtn = document.getElementById('reset-coloring-button');
+            if (coloringSelector) coloringSelector.style.display = 'block';
+            if (coloringCanvasArea) coloringCanvasArea.style.display = 'none';
+            if (coloringPalette) coloringPalette.style.display = 'none';
+            if (resetColoringBtn) resetColoringBtn.style.display = 'none';
+            selectedColoringPageSVGElement = null;
+
             clearCurrentActivityIndicator(); 
             const activityAudio = activityModal.querySelector('audio');
             if (activityAudio) {
@@ -486,14 +620,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Hamburger Menu Logic
     const hamburgerButton = document.getElementById('hamburger-menu');
     const navLinks = document.querySelector('.nav-links');
-    const mainElement = document.querySelector('main'); 
 
     if (hamburgerButton && navLinks) {
         hamburgerButton.addEventListener('click', (event) => {
-            event.stopPropagation(); // Prevent click from immediately closing via mainElement listener
+            event.stopPropagation(); 
             navLinks.classList.toggle('mobile-nav-active');
             const isExpanded = navLinks.classList.contains('mobile-nav-active');
             hamburgerButton.setAttribute('aria-expanded', isExpanded);
@@ -509,20 +641,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
+        navLinks.querySelectorAll('li > a, li > button').forEach(linkOrButton => { 
+            linkOrButton.addEventListener('click', () => {
                 if (navLinks.classList.contains('mobile-nav-active')) {
-                    navLinks.classList.remove('mobile-nav-active');
-                    hamburgerButton.setAttribute('aria-expanded', 'false');
-                    const icon = hamburgerButton.querySelector('i');
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
-                    document.body.classList.remove('mobile-nav-open');
+                    if (linkOrButton.tagName === 'A' || (linkOrButton.tagName === 'BUTTON' && linkOrButton.id !== 'theme-switcher')) {
+                        navLinks.classList.remove('mobile-nav-active');
+                        hamburgerButton.setAttribute('aria-expanded', 'false');
+                        const icon = hamburgerButton.querySelector('i');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                        document.body.classList.remove('mobile-nav-open');
+                    }
                 }
             });
         });
 
-        // Close menu if clicked outside on main content or header (but not on nav itself)
         document.addEventListener('click', (event) => {
             if (navLinks.classList.contains('mobile-nav-active') && 
                 !navLinks.contains(event.target) && 
@@ -545,24 +678,19 @@ function createFavoritePracticeCard(practiceId) {
         console.warn(`Details or iconClass missing for practice: ${practiceId}`);
         return null;
     }
-
     const card = document.createElement('div');
     card.className = 'practice-card'; 
     card.dataset.itemId = practiceId;
     card.onclick = () => startPractice(practiceId);
-
     const titleText = translations[currentLanguage]?.[practiceDetails.titleKey] || practiceId;
     const descText = translations[currentLanguage]?.[practiceDetails.simpleDescriptionKey] || 'Description';
     const favIconLabel = translations[currentLanguage]?.addToFavorites || 'Add to favorites';
-
-
     card.innerHTML = `
         <i class="${practiceDetails.iconClass}"></i>
         <h3 data-lang-key="${practiceDetails.titleKey}">${titleText}</h3>
         <span class="favorite-icon" data-item-id="${practiceId}" data-item-category="practice" role="button" aria-label="${favIconLabel}" tabindex="0"><i class="far fa-heart"></i></span>
         <p data-lang-key="${practiceDetails.simpleDescriptionKey}">${descText}</p>
     `;
-    
     const favIcon = card.querySelector('.favorite-icon');
     if (favIcon) {
         updateFavoriteIcon(favIcon, practiceId, 'practice'); 
@@ -589,30 +717,24 @@ function createFavoriteActivityCard(activityId) {
         console.warn(`Original card not found for activity: ${activityId}`);
         return null;
     }
-
     const card = document.createElement('div');
     card.className = 'activity-card';
     card.dataset.itemId = activityId;
     card.onclick = () => openActivity(activityId);
-
     const iconClass = originalCard.querySelector('i') ? originalCard.querySelector('i').className : 'fas fa-puzzle-piece';
     const titleElement = originalCard.querySelector('h3');
     const descElement = originalCard.querySelector('p');
-
     const titleKey = titleElement ? titleElement.dataset.langKey : '';
     const descKey = descElement ? descElement.dataset.langKey : '';
-
     const titleText = titleElement ? (translations[currentLanguage][titleKey] || titleElement.textContent) : activityId;
     const descText = descElement ? (translations[currentLanguage][descKey] || descElement.textContent) : 'Activity Description';
     const favIconLabel = translations[currentLanguage]?.addToFavorites || 'Add to favorites';
-
     card.innerHTML = `
         <i class="${iconClass}"></i>
         <h3 ${titleKey ? `data-lang-key="${titleKey}"` : ''}>${titleText}</h3>
         <span class="favorite-icon" data-item-id="${activityId}" data-item-category="activity" role="button" aria-label="${favIconLabel}" tabindex="0"><i class="far fa-heart"></i></span>
         <p ${descKey ? `data-lang-key="${descKey}"` : ''}>${descText}</p>
     `;
-    
     const favIcon = card.querySelector('.favorite-icon');
      if (favIcon) {
         updateFavoriteIcon(favIcon, activityId, 'activity'); 
@@ -638,10 +760,8 @@ function displayFavoritesPage() {
     const favActivitiesGrid = document.getElementById('favorite-activity-grid');
     const noFavPracticesMsg = favPracticesGrid.querySelector('.empty-favorites-message');
     const noFavActivitiesMsg = favActivitiesGrid.querySelector('.empty-favorites-message');
-
     favPracticesGrid.innerHTML = ''; 
     favActivitiesGrid.innerHTML = ''; 
-
     let hasFavPractices = false;
     if (userFavorites.practice && userFavorites.practice.length > 0) {
         userFavorites.practice.forEach(practiceId => {
@@ -652,7 +772,6 @@ function displayFavoritesPage() {
             }
         });
     }
-    
     if (!hasFavPractices) {
         if (noFavPracticesMsg) { 
             noFavPracticesMsg.style.display = 'block';
@@ -661,8 +780,6 @@ function displayFavoritesPage() {
     } else if (noFavPracticesMsg) {
          noFavPracticesMsg.style.display = 'none'; 
     }
-
-
     let hasFavActivities = false;
     if (userFavorites.activity && userFavorites.activity.length > 0) {
         userFavorites.activity.forEach(activityId => {
@@ -673,7 +790,6 @@ function displayFavoritesPage() {
             }
         });
     }
-
     if (!hasFavActivities) {
         if (noFavActivitiesMsg) { 
             noFavActivitiesMsg.style.display = 'block';
@@ -684,17 +800,32 @@ function displayFavoritesPage() {
     }
 }
 
+function displayJournalPrompt(promptType) {
+    const promptContainerId = `${promptType}-prompt-container`;
+    const promptTextId = `${promptType}-prompt-text`;
+    let promptContainer = document.getElementById(promptContainerId);
+    if (!promptContainer) return; 
+    const prompts = promptType === 'gratitude' ? gratitudePrompts[currentLanguage] : emotionPrompts[currentLanguage];
+    if (!prompts || prompts.length === 0) {
+        promptContainer.style.display = 'none';
+        return;
+    }
+    promptContainer.style.display = 'block';
+    const randomIndex = Math.floor(Math.random() * prompts.length);
+    const promptTextElement = document.getElementById(promptTextId);
+    if (promptTextElement) {
+        promptTextElement.textContent = prompts[randomIndex];
+    }
+}
 
 function openActivity(type, isRefresh = false) {
     const modal = document.getElementById('activity-modal'); 
     const titleElement = document.getElementById('activity-title');
     const contentElement = document.getElementById('activity-content');
-
     if (!modal || !titleElement || !contentElement) {
         console.error('Activity modal elements not found!');
         return;
     }
-    
     if (!isRefresh) { 
         clearCurrentActivityIndicator(); 
         const activityCard = document.querySelector(`.activity-card[data-item-id="${type}"]`);
@@ -704,17 +835,24 @@ function openActivity(type, isRefresh = false) {
         }
     }
     modal.dataset.currentActivityType = type; 
-
     let activityTitleKey = `activity${type.charAt(0).toUpperCase() + type.slice(1)}Title`; 
     titleElement.textContent = translations[currentLanguage]?.[activityTitleKey] || translations[currentLanguage]?.activityModalTitlePlaceholder || type;
-
     let activityContent = '';
-
+    const journalPromptHTML = (journalType) => `
+        <div id="${journalType}-prompt-container" class="journal-prompt-container">
+            <p class="journal-prompt-title" data-lang-key="journalPromptTitle">${translations[currentLanguage]?.journalPromptTitle || "Need inspiration? Try this prompt:"}</p>
+            <p id="${journalType}-prompt-text" class="journal-prompt-text"></p>
+            <button onclick="displayJournalPrompt('${journalType}')" class="journal-prompt-button" data-lang-key="newPromptButtonText">
+                ${translations[currentLanguage]?.newPromptButtonText || "New Prompt"}
+            </button>
+        </div>
+    `;
     switch(type) {
         case 'gratitudeJournal':
             activityContent = `
-                <p class="instructions" data-lang-key="gratitudeJournalPrompt">${translations[currentLanguage]?.gratitudeJournalPrompt || "Take a few moments to write down three things you are grateful for today."}</p>
-                <textarea id="gratitude-text" rows="5" placeholder="${translations[currentLanguage]?.gratitudeJournalPlaceholder || "Type here..."}" style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;"></textarea>
+                ${journalPromptHTML('gratitude')}
+                <p class="instructions" data-lang-key="gratitudeJournalInstruction">${translations[currentLanguage]?.gratitudeJournalInstruction || "Take a few moments to write down things you are grateful for today, or respond to the prompt above."}</p>
+                <textarea id="gratitude-text" rows="5" placeholder="${translations[currentLanguage]?.gratitudeJournalPlaceholder || "Type here..."}" style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color);"></textarea>
                 <button onclick="saveGratitude()" class="activity-action-button" data-lang-key="saveButtonText">${translations[currentLanguage]?.saveButtonText || "Save Entry"}</button>
                 <div id="past-gratitude-entries" style="margin-top: 20px;">
                     <h4 data-lang-key="pastGratitudeEntriesTitle">${translations[currentLanguage]?.pastGratitudeEntriesTitle || "Your Past Gratitude Entries:"}</h4>
@@ -722,21 +860,35 @@ function openActivity(type, isRefresh = false) {
                 </div>
             `;
             break;
+        case 'emotionCheckIn':
+            activityContent = `
+                ${journalPromptHTML('emotion')}
+                <p class="instructions" data-lang-key="modalContent.emotionCheckIn.introduction">${translations[currentLanguage]?.modalContent?.emotionCheckIn?.introduction || "Take a moment to notice and name how you're feeling right now, without judgment. You can use the prompt above for reflection."}</p>
+                <label for="emotionalCheckInInput" style="display:block; margin-top:15px;" data-lang-key="modalContent.emotionCheckIn.detailedInputLabel">${translations[currentLanguage]?.modalContent?.emotionCheckIn?.detailedInputLabel || "Share more about how you're feeling:"}</label>
+                <textarea id="emotionalCheckInInput" rows="5" placeholder="${translations[currentLanguage]?.modalContent?.emotionCheckIn?.detailedInputPlaceholder || "Write your thoughts and feelings here..."}" style="width: 100%; margin-top: 5px; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); box-sizing: border-box;"></textarea>
+                <button onclick="saveEmotionalCheckIn()" class="activity-action-button" data-lang-key="modalContent.emotionCheckIn.saveButtonText">${translations[currentLanguage]?.modalContent?.emotionCheckIn?.saveButtonText || "Save Check-in"}</button>
+                <div id="pastEmotionalCheckIns" style="margin-top: 20px;">
+                    <h4 data-lang-key="modalContent.emotionCheckIn.savedCheckInsTitle">${translations[currentLanguage]?.modalContent?.emotionCheckIn?.savedCheckInsTitle || "Your Past Check-ins:"}</h4>
+                    <ul id="emotionalCheckInList" class="past-entries-list"></ul>
+                </div>
+            `; 
+            break;
         case 'mindfulDrawing':
             activityContent = `
-                <p class="instructions" data-lang-key="mindfulDrawingPrompt">${translations[currentLanguage]?.mindfulDrawingPrompt || "Find a piece of paper and something to draw with. Focus on the sensation of drawing, the lines, and the colors. Let your creativity flow without judgment."}</p>
-                <p style="margin-top:10px;" data-lang-key="mindfulDrawingTip">${translations[currentLanguage]?.mindfulDrawingTip || "There's no right or wrong way to do this, just enjoy the process!"}</p>
-                <div style="margin-top: 15px; text-align:center;">
-                    <img src="https://via.placeholder.com/300x200.png?text=Mindful+Drawing+Space" alt="Mindful Drawing Placeholder" style="max-width:100%; border-radius: 5px;">
+                <p class="instructions" data-lang-key="mindfulDrawingPrompt">${translations[currentLanguage]?.mindfulDrawingPrompt || "Focus on the sensation of drawing, the lines, and the colors. Let your creativity flow without judgment."}</p>
+                <div class="drawing-controls">
+                    <div>
+                        <label for="drawing-color-picker" data-lang-key="drawingColorLabel">${translations[currentLanguage]?.drawingColorLabel || "Color:"}</label>
+                        <input type="color" id="drawing-color-picker" value="${currentColor}">
+                    </div>
+                    <div>
+                        <label for="drawing-brush-size" data-lang-key="drawingBrushSizeLabel">${translations[currentLanguage]?.drawingBrushSizeLabel || "Brush Size:"}</label>
+                        <input type="range" id="drawing-brush-size" min="1" max="50" value="${currentBrushSize}">
+                        <span id="drawing-brush-size-value">${currentBrushSize}px</span>
+                    </div>
+                    <button id="drawing-clear-canvas" class="activity-action-button" data-lang-key="drawingClearCanvas">${translations[currentLanguage]?.drawingClearCanvas || "Clear Canvas"}</button>
                 </div>
-                <div style="margin-top: 20px;">
-                    <p data-lang-key="mindfulDrawingOnlineToolsPrompt">${translations[currentLanguage]?.mindfulDrawingOnlineToolsPrompt || "Here are some online drawing tools you can explore:"}</p>
-                    <ul>
-                        <li><a href="https://sketch.io/sketchpad/" target="_blank" rel="noopener noreferrer">Sketchpad</a></li>
-                        <li><a href="https://jspaint.app/" target="_blank" rel="noopener noreferrer">JS Paint (classic MS Paint)</a></li>
-                        <li><a href="https://kleki.com/" target="_blank" rel="noopener noreferrer">Kleki</a></li>
-                    </ul>
-                </div>
+                <canvas id="mindful-drawing-canvas"></canvas>
             `;
             break;
         case 'mindfulListening':
@@ -751,21 +903,6 @@ function openActivity(type, isRefresh = false) {
                     </audio>
                 </div>
                  <p style="margin-top:10px;" data-lang-key="modalContent.mindfulListening.afterAudioPrompt">${translations[currentLanguage]?.modalContent?.mindfulListening?.afterAudioPrompt || "What sounds did you notice?"}</p>
-            `;
-            break;
-        case 'emotionCheckIn':
-            activityContent = `
-                <p class="instructions" data-lang-key="modalContent.emotionCheckIn.introduction">${translations[currentLanguage]?.modalContent?.emotionCheckIn?.introduction || "Take a moment to notice and name how you're feeling right now, without judgment."}</p>
-                
-                <label for="emotionalCheckInInput" style="display:block; margin-top:15px;" data-lang-key="modalContent.emotionCheckIn.detailedInputLabel">${translations[currentLanguage]?.modalContent?.emotionCheckIn?.detailedInputLabel || "Share more about how you're feeling:"}</label>
-                <textarea id="emotionalCheckInInput" rows="5" placeholder="${translations[currentLanguage]?.modalContent?.emotionCheckIn?.detailedInputPlaceholder || "Write your thoughts and feelings here..."}" style="width: 100%; margin-top: 5px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;"></textarea>
-                <button onclick="saveEmotionalCheckIn()" class="activity-action-button" data-lang-key="modalContent.emotionCheckIn.saveButtonText">${translations[currentLanguage]?.modalContent?.emotionCheckIn?.saveButtonText || "Save Check-in"}</button>
-
-                <div id="pastEmotionalCheckIns" style="margin-top: 20px;">
-                    <h4 data-lang-key="modalContent.emotionCheckIn.savedCheckInsTitle">${translations[currentLanguage]?.modalContent?.emotionCheckIn?.savedCheckInsTitle || "Your Past Check-ins:"}</h4>
-                    <ul id="emotionalCheckInList" class="past-entries-list"></ul>
-                </div>
-                <p style="margin-top:15px;" data-lang-key="modalContent.emotionCheckIn.reflectionPrompt">${translations[currentLanguage]?.modalContent?.emotionCheckIn?.reflectionPrompt || "Where do you feel this emotion in your body? What does it feel like?"}</p>
             `;
             break;
         case 'mindfulMovements':
@@ -848,18 +985,17 @@ function openActivity(type, isRefresh = false) {
         case 'mindfulColoring':
             activityContent = `
                 <p class="instructions">${translations[currentLanguage]?.modalContent?.mindfulColoring?.introduction || "Engage your senses by focusing on the act of coloring."}</p>
-                <p style="margin-top:10px;">${translations[currentLanguage]?.modalContent?.mindfulColoring?.prompt || "Select a coloring page and begin coloring."}</p>
-                <div style="margin-top: 15px; text-align:center;">
-                    <img src="https://via.placeholder.com/300x200.png?text=Mindful+Coloring+Example" alt="Mindful Coloring Placeholder" style="max-width:100%; border-radius: 5px;">
+                <div id="coloring-page-selector" class="coloring-page-selector">
+                    <p data-lang-key="coloringPageChoose">${translations[currentLanguage]?.coloringPageChoose || "Choose an image to color:"}</p>
+                    <!-- Thumbnails will be added here by JS -->
                 </div>
-                <div style="margin-top: 20px;">
-                     <p data-lang-key="mindfulColoringPrintablesPrompt">${translations[currentLanguage]?.mindfulColoringPrintablesPrompt || "Here are some links to printable coloring pages:"}</p>
-                    <ul>
-                        <li><a href="https://www.justcolor.net/mandalas/" target="_blank" rel="noopener noreferrer">Just Color - Mandalas</a></li>
-                        <li><a href="https://www.crayola.com/free-coloring-pages/adult-coloring-pages/" target="_blank" rel="noopener noreferrer">Crayola - Adult Coloring Pages</a></li>
-                        <li><a href="https://www.itsybitsyfun.com/coloring-pages.html" target="_blank" rel="noopener noreferrer">Itsy Bitsy Fun - Coloring Pages</a></li>
-                    </ul>
+                <div id="coloring-page-canvas-area" class="coloring-page-canvas-area" style="display:none;">
+                    <!-- SVG will be loaded here -->
                 </div>
+                <div id="coloring-palette-container" class="coloring-palette-container" style="display:none;">
+                    <!-- Color palette will be added here by JS -->
+                </div>
+                 <button id="reset-coloring-button" class="activity-action-button" style="display:none;" data-lang-key="resetColorsButton">${translations[currentLanguage]?.resetColorsButton || "Reset Colors"}</button>
             `;
             break;
         case 'positiveAffirmations':
@@ -870,8 +1006,8 @@ function openActivity(type, isRefresh = false) {
                 </ul>
                 <p style="margin-top:10px;" data-lang-key="affirmationsCreateOwn">${translations[currentLanguage]?.affirmationsCreateOwn || "You can also create your own affirmations!"}</p>
                 <div style="margin-top: 20px;">
-                    <textarea id="user-affirmation-text" rows="3" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" placeholder="${translations[currentLanguage]?.affirmationInputPlaceholder || "Type your own affirmation here..."}"></textarea>
-                    <button onclick="saveUserAffirmation()" class="activity-action-button" data-lang-key="saveMyAffirmationButton">${translations[currentLanguage]?.saveMyAffirmationButton || "Save My Affirmation"}</button>
+                    <textarea id="user-affirmation-text" rows="3" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color);" placeholder="${translations[currentLanguage]?.affirmationInputPlaceholder || "Type your own affirmation here..."}"></textarea>
+                    <button id="save-affirmation-button" onclick="saveUserAffirmation()" class="activity-action-button" data-lang-key="saveMyAffirmationButton">${translations[currentLanguage]?.saveMyAffirmationButton || "Save My Affirmation"}</button>
                 </div>
                 <div id="user-affirmations-list" style="margin-top: 20px;">
                     <h4 data-lang-key="mySavedAffirmationsTitle">${translations[currentLanguage]?.mySavedAffirmationsTitle || "My Saved Affirmations:"}</h4>
@@ -890,7 +1026,7 @@ function openActivity(type, isRefresh = false) {
                         Your browser does not support the audio element. (Placeholder: mindful-story.mp3)
                     </audio>
                 </div>
-                 <textarea rows="3" style="width: 100%; margin-top:15px; padding: 10px; border-radius: 5px; border: 1px solid #ccc;" placeholder="${translations[currentLanguage]?.modalContent?.mindfulStorytelling?.storyPlaceholder || "Start writing your story here..."}"></textarea>
+                 <textarea rows="3" style="width: 100%; margin-top:15px; padding: 10px; border-radius: 5px; border: 1px solid var(--border-color);" placeholder="${translations[currentLanguage]?.modalContent?.mindfulStorytelling?.storyPlaceholder || "Start writing your story here..."}"></textarea>
             `;
             break;
         default:
@@ -900,6 +1036,25 @@ function openActivity(type, isRefresh = false) {
     }
 
     contentElement.innerHTML = activityContent;
+
+    if (type === 'gratitudeJournal') {
+        displayJournalPrompt('gratitude');
+        displayGratitudeEntries();
+    }
+    if (type === 'emotionCheckIn') {
+        displayJournalPrompt('emotion');
+        displayEmotionalCheckIns();
+    }
+    if (type === 'positiveAffirmations') { 
+        displayUserAffirmations();
+    }
+    if (type === 'mindfulDrawing') {
+        initializeDrawingCanvas();
+    }
+    if (type === 'mindfulColoring') {
+        initializeColoringPageSelector();
+    }
+
 
     const activityAudioElement = contentElement.querySelector('audio');
     if (activityAudioElement) {
@@ -926,41 +1081,82 @@ function openActivity(type, isRefresh = false) {
         });
     }
 
-    if (type === 'gratitudeJournal') {
-        displayGratitudeEntries();
-    }
-    if (type === 'emotionCheckIn') {
-        displayEmotionalCheckIns();
-    }
-    if (type === 'positiveAffirmations') { 
-        displayUserAffirmations();
-    }
-
     if (!isRefresh) {
-        modal.style.display = 'flex';
+        modal.classList.add('show');
     }
 }
 
 function saveUserAffirmation() {
     const affirmationTextElement = document.getElementById('user-affirmation-text');
     const affirmationText = affirmationTextElement.value.trim();
+    const saveButton = document.getElementById('save-affirmation-button');
+
     if (affirmationText === "") {
         showFeedbackMessage(translations[currentLanguage]?.affirmationEmptyAlert || "Please write an affirmation.", 'error');
         return;
     }
 
     let userAffirmations = JSON.parse(localStorage.getItem('userAffirmations')) || [];
-    if (userAffirmations.includes(affirmationText)) {
-        showFeedbackMessage(translations[currentLanguage]?.affirmationExistsAlert || "This affirmation is already saved.", 'info');
-        return;
-    }
-    userAffirmations.push(affirmationText);
-    localStorage.setItem('userAffirmations', JSON.stringify(userAffirmations));
 
-    showFeedbackMessage(translations[currentLanguage]?.affirmationSavedSuccess || "Affirmation saved!", 'success');
+    if (editingAffirmationIndex !== null) { 
+        userAffirmations[editingAffirmationIndex] = affirmationText;
+        showFeedbackMessage(translations[currentLanguage]?.affirmationUpdatedSuccess || "Affirmation updated!", 'success');
+    } else { 
+        if (userAffirmations.includes(affirmationText)) {
+            showFeedbackMessage(translations[currentLanguage]?.affirmationExistsAlert || "This affirmation is already saved.", 'info');
+            return;
+        }
+        userAffirmations.push(affirmationText);
+        showFeedbackMessage(translations[currentLanguage]?.affirmationSavedSuccess || "Affirmation saved!", 'success');
+    }
+    
+    localStorage.setItem('userAffirmations', JSON.stringify(userAffirmations));
     affirmationTextElement.value = ''; 
+    editingAffirmationIndex = null; 
+    if (saveButton) { 
+        saveButton.textContent = translations[currentLanguage]?.saveMyAffirmationButton || "Save My Affirmation";
+        saveButton.setAttribute('data-lang-key', 'saveMyAffirmationButton');
+    }
     displayUserAffirmations(); 
 }
+
+function editUserAffirmation(index) {
+    let userAffirmations = JSON.parse(localStorage.getItem('userAffirmations')) || [];
+    if (index >= 0 && index < userAffirmations.length) {
+        const affirmationTextElement = document.getElementById('user-affirmation-text');
+        const saveButton = document.getElementById('save-affirmation-button');
+        
+        if(affirmationTextElement && saveButton) {
+            affirmationTextElement.value = userAffirmations[index];
+            affirmationTextElement.focus();
+            editingAffirmationIndex = index;
+            saveButton.textContent = translations[currentLanguage]?.updateAffirmationButton || "Update Affirmation";
+            saveButton.removeAttribute('data-lang-key'); 
+        }
+    }
+}
+
+function deleteUserAffirmation(index) {
+    let userAffirmations = JSON.parse(localStorage.getItem('userAffirmations')) || [];
+    if (index >= 0 && index < userAffirmations.length) {
+        userAffirmations.splice(index, 1);
+        localStorage.setItem('userAffirmations', JSON.stringify(userAffirmations));
+        showFeedbackMessage(translations[currentLanguage]?.affirmationDeletedSuccess || "Affirmation deleted.", 'success');
+        
+        if (editingAffirmationIndex === index) {
+            const affirmationTextElement = document.getElementById('user-affirmation-text');
+            const saveButton = document.getElementById('save-affirmation-button');
+            if (affirmationTextElement) affirmationTextElement.value = '';
+            editingAffirmationIndex = null;
+            if (saveButton) {
+                saveButton.textContent = translations[currentLanguage]?.saveMyAffirmationButton || "Save My Affirmation";
+                saveButton.setAttribute('data-lang-key', 'saveMyAffirmationButton');
+            }
+        }
+        displayUserAffirmations();
+    }
+}
+
 
 function displayUserAffirmations() {
     const ul = document.getElementById('user-affirmations-ul');
@@ -973,9 +1169,35 @@ function displayUserAffirmations() {
         li.className = 'empty-entries-message'; 
         ul.appendChild(li);
     } else {
-        userAffirmations.forEach(affirmation => {
+        userAffirmations.forEach((affirmation, index) => {
             const li = document.createElement('li');
-            li.textContent = affirmation;
+            li.className = 'affirmation-list-item';
+
+            const textSpan = document.createElement('span');
+            textSpan.textContent = affirmation;
+            textSpan.className = 'affirmation-text-item';
+            li.appendChild(textSpan);
+
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'affirmation-item-controls';
+
+            const editButton = document.createElement('button');
+            editButton.innerHTML = `<i class="fas fa-edit"></i> ${translations[currentLanguage]?.editButtonText || "Edit"}`;
+            editButton.className = 'affirmation-edit-button';
+            editButton.onclick = () => editUserAffirmation(index);
+            controlsDiv.appendChild(editButton);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.innerHTML = `<i class="fas fa-trash-alt"></i> ${translations[currentLanguage]?.deleteButtonText || "Delete"}`;
+            deleteButton.className = 'affirmation-delete-button';
+            deleteButton.onclick = () => {
+                if (confirm(translations[currentLanguage]?.confirmDeleteAffirmation || "Are you sure you want to delete this affirmation?")) {
+                    deleteUserAffirmation(index);
+                }
+            };
+            controlsDiv.appendChild(deleteButton);
+            
+            li.appendChild(controlsDiv);
             ul.appendChild(li);
         });
     }
@@ -988,16 +1210,13 @@ function saveGratitude() {
         showFeedbackMessage(translations[currentLanguage]?.gratitudeJournalEmptyAlert || "Please write something you are grateful for.", 'error');
         return;
     }
-    
     const newEntry = {
         text: gratitudeText,
         timestamp: new Date().toISOString()
     };
-
     let gratitudeEntries = JSON.parse(localStorage.getItem('userGratitudeEntries')) || [];
     gratitudeEntries.push(newEntry);
     localStorage.setItem('userGratitudeEntries', JSON.stringify(gratitudeEntries));
-
     showFeedbackMessage(translations[currentLanguage]?.gratitudeJournalSavedSuccess || "Gratitude entry saved!", 'success');
     gratitudeTextElement.value = ''; 
     displayGratitudeEntries();
@@ -1007,9 +1226,7 @@ function displayGratitudeEntries() {
     const listElement = document.getElementById('gratitude-entries-list');
     if (!listElement) return;
     listElement.innerHTML = '';
-
     let gratitudeEntries = JSON.parse(localStorage.getItem('userGratitudeEntries')) || [];
-
     if (gratitudeEntries.length === 0) {
         const li = document.createElement('li');
         li.textContent = translations[currentLanguage]?.noGratitudeEntriesYet || "You haven't saved any gratitude entries yet.";
@@ -1017,7 +1234,6 @@ function displayGratitudeEntries() {
         listElement.appendChild(li);
     } else {
         gratitudeEntries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); 
-
         gratitudeEntries.forEach(entry => {
             const li = document.createElement('li');
             const timestamp = new Date(entry.timestamp);
@@ -1025,13 +1241,11 @@ function displayGratitudeEntries() {
                 year: 'numeric', month: 'long', day: 'numeric', 
                 hour: 'numeric', minute: '2-digit' 
             });
-
             li.innerHTML = `<strong>${formattedTime}:</strong><br>${entry.text.replace(/\n/g, '<br>')}`;
             listElement.appendChild(li);
         });
     }
 }
-
 
 function saveEmotionalCheckIn() {
     const inputElement = document.getElementById('emotionalCheckInInput');
@@ -1040,24 +1254,19 @@ function saveEmotionalCheckIn() {
         return;
     }
     const checkInText = inputElement.value.trim();
-
     if (checkInText === "") {
         showFeedbackMessage(translations[currentLanguage]?.modalContent?.emotionCheckIn?.emptyTextareaAlert || "Please write something before saving.", 'error');
         return;
     }
-
     const newEntry = {
         text: checkInText,
         timestamp: new Date().toISOString()
     };
-
     let emotionalCheckIns = JSON.parse(localStorage.getItem('userEmotionalCheckIns')) || [];
     emotionalCheckIns.push(newEntry);
     localStorage.setItem('userEmotionalCheckIns', JSON.stringify(emotionalCheckIns));
-
     showFeedbackMessage(translations[currentLanguage]?.modalContent?.emotionCheckIn?.checkInSavedSuccess || "Your emotional check-in has been saved.", 'success');
     inputElement.value = ''; 
-    
     displayEmotionalCheckIns(); 
 }
 
@@ -1067,9 +1276,7 @@ function displayEmotionalCheckIns() {
         return; 
     }
     listElement.innerHTML = ''; 
-
     let emotionalCheckIns = JSON.parse(localStorage.getItem('userEmotionalCheckIns')) || [];
-
     if (emotionalCheckIns.length === 0) {
         const li = document.createElement('li');
         li.textContent = translations[currentLanguage]?.modalContent?.emotionCheckIn?.noCheckInsYet || "You haven't saved any check-ins yet.";
@@ -1077,7 +1284,6 @@ function displayEmotionalCheckIns() {
         listElement.appendChild(li);
     } else {
         emotionalCheckIns.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
         emotionalCheckIns.forEach(entry => {
             const li = document.createElement('li');
             const timestamp = new Date(entry.timestamp);
@@ -1085,13 +1291,11 @@ function displayEmotionalCheckIns() {
                 year: 'numeric', month: 'long', day: 'numeric', 
                 hour: 'numeric', minute: '2-digit' 
             });
-
             li.innerHTML = `<strong>${formattedTime}:</strong><br>${entry.text.replace(/\n/g, '<br>')}`;
             listElement.appendChild(li);
         });
     }
 }
-
 
 function startPractice(practiceType, isRefresh = false) {
     const practiceDetails = practiceDataStore[practiceType];
@@ -1110,8 +1314,6 @@ function startPractice(practiceType, isRefresh = false) {
         }
     }
     modal.dataset.currentPracticeType = practiceType; 
-
-
     const { titleKey, simpleDescriptionKey, audioFileBase, modalContentKey } = practiceDetails;
     const titleElement = document.getElementById('practice-title');
     const descriptionElement = document.getElementById('practice-description');
@@ -1119,21 +1321,14 @@ function startPractice(practiceType, isRefresh = false) {
     const audioSourceElement = audioElement ? audioElement.querySelector('source') : null;
     const favoriteIcon = modal ? modal.querySelector('.favorite-icon.practice-favorite-icon') : null;
     const progressDisplay = document.getElementById('audio-progress-display');
-
-
     if (!modal || !titleElement || !descriptionElement || !audioElement || !audioSourceElement || !favoriteIcon || !progressDisplay) {
         console.error('Practice modal elements (including progress display) not found!');
         return;
     }
-    
     progressDisplay.textContent = "00:00 / 00:00";
-
-
     titleElement.textContent = translations[currentLanguage]?.[titleKey] || practiceDetails.titleKey || 'Practice Title';
-
     let descriptionHtml = '';
     const richContent = translations[currentLanguage]?.modalContent?.[modalContentKey];
-
     if (richContent && richContent.introduction) {
         descriptionHtml = `<p>${richContent.introduction.replace(/\n/g, '<br>')}</p>`;
         if (richContent.steps && Array.isArray(richContent.steps) && richContent.steps.length > 0) {
@@ -1149,36 +1344,277 @@ function startPractice(practiceType, isRefresh = false) {
     } else {
         descriptionElement.innerHTML = '<p>Description not available.</p>';
     }
-    
     const langSpecificAudioFile = `audio/${currentLanguage}/${audioFileBase}`;
-    if (audioSourceElement) audioSourceElement.src = langSpecificAudioFile; // Check if source element exists
+    if (audioSourceElement) audioSourceElement.src = langSpecificAudioFile; 
     audioElement.load(); 
-    
     const onLoadedMetadata = () => {
         progressDisplay.textContent = `${formatTime(audioElement.currentTime)} / ${formatTime(audioElement.duration)}`;
     };
     const onTimeUpdate = () => {
         progressDisplay.textContent = `${formatTime(audioElement.currentTime)} / ${formatTime(audioElement.duration)}`;
     };
-
     if (audioElement._onLoadedMetadata) {
         audioElement.removeEventListener('loadedmetadata', audioElement._onLoadedMetadata);
     }
     if (audioElement._onTimeUpdate) {
         audioElement.removeEventListener('timeupdate', audioElement._onTimeUpdate);
     }
-
     audioElement._onLoadedMetadata = onLoadedMetadata; 
     audioElement._onTimeUpdate = onTimeUpdate;
-
     audioElement.addEventListener('loadedmetadata', audioElement._onLoadedMetadata);
     audioElement.addEventListener('timeupdate', audioElement._onTimeUpdate);
-
-
     favoriteIcon.dataset.itemId = practiceType; 
     updateFavoriteIcon(favoriteIcon, practiceType, 'practice');
-    
     if(!isRefresh) {
-        modal.style.display = 'flex'; 
+        modal.classList.add('show'); 
     }
+}
+
+// --- Drawing Canvas Functions ---
+function initializeDrawingCanvas() {
+    drawingCanvas = document.getElementById('mindful-drawing-canvas');
+    if (!drawingCanvas) return;
+    drawingCtx = drawingCanvas.getContext('2d');
+
+    const modalContent = drawingCanvas.closest('.modal-content');
+    const containerWidth = modalContent ? modalContent.clientWidth - 40 : 500; 
+    drawingCanvas.width = containerWidth;
+    drawingCanvas.height = Math.min(300, containerWidth * 0.6); 
+
+
+    drawingCtx.strokeStyle = currentColor;
+    drawingCtx.lineWidth = currentBrushSize;
+    drawingCtx.lineCap = 'round';
+    drawingCtx.lineJoin = 'round';
+
+    drawingCanvas.addEventListener('mousedown', startDrawing);
+    drawingCanvas.addEventListener('mousemove', draw);
+    drawingCanvas.addEventListener('mouseup', stopDrawing);
+    drawingCanvas.addEventListener('mouseout', stopDrawing); 
+    drawingCanvas.addEventListener('touchstart', startDrawingTouch, { passive: false });
+    drawingCanvas.addEventListener('touchmove', drawTouch, { passive: false });
+    drawingCanvas.addEventListener('touchend', stopDrawing);
+
+
+    const colorPicker = document.getElementById('drawing-color-picker');
+    const brushSizeSlider = document.getElementById('drawing-brush-size');
+    const brushSizeValue = document.getElementById('drawing-brush-size-value');
+    const clearButton = document.getElementById('drawing-clear-canvas');
+
+    if (colorPicker) {
+        colorPicker.value = currentColor; 
+        colorPicker.addEventListener('input', (e) => {
+            currentColor = e.target.value;
+            if(drawingCtx) drawingCtx.strokeStyle = currentColor;
+        });
+    }
+    if (brushSizeSlider && brushSizeValue) {
+        brushSizeSlider.value = currentBrushSize; 
+        brushSizeValue.textContent = `${currentBrushSize}px`;
+        brushSizeSlider.addEventListener('input', (e) => {
+            currentBrushSize = e.target.value;
+            if(drawingCtx) drawingCtx.lineWidth = currentBrushSize;
+            brushSizeValue.textContent = `${currentBrushSize}px`;
+        });
+    }
+    if (clearButton) {
+        clearButton.onclick = () => {
+            if(drawingCtx) drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        };
+    }
+}
+
+function getMousePos(canvas, evt) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
+}
+function getTouchPos(canvas, touchEvt) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: touchEvt.touches[0].clientX - rect.left,
+        y: touchEvt.touches[0].clientY - rect.top
+    };
+}
+
+
+function startDrawing(e) {
+    isDrawing = true;
+    const pos = getMousePos(drawingCanvas, e);
+    [lastX, lastY] = [pos.x, pos.y];
+    drawingCtx.beginPath(); 
+    drawingCtx.moveTo(lastX, lastY);
+}
+function startDrawingTouch(e) {
+    e.preventDefault(); 
+    isDrawing = true;
+    const pos = getTouchPos(drawingCanvas, e);
+    [lastX, lastY] = [pos.x, pos.y];
+    drawingCtx.beginPath();
+    drawingCtx.moveTo(lastX, lastY);
+}
+
+
+function draw(e) {
+    if (!isDrawing) return;
+    const pos = getMousePos(drawingCanvas, e);
+    drawingCtx.lineTo(pos.x, pos.y);
+    drawingCtx.stroke();
+    [lastX, lastY] = [pos.x, pos.y];
+}
+function drawTouch(e) {
+    if (!isDrawing) return;
+    e.preventDefault(); 
+    const pos = getTouchPos(drawingCanvas, e);
+    drawingCtx.lineTo(pos.x, pos.y);
+    drawingCtx.stroke();
+    [lastX, lastY] = [pos.x, pos.y];
+}
+
+function stopDrawing() {
+    if (isDrawing) {
+        drawingCtx.closePath(); 
+        isDrawing = false;
+    }
+}
+
+function removeDrawingEventListeners() {
+    if (drawingCanvas) {
+        drawingCanvas.removeEventListener('mousedown', startDrawing);
+        drawingCanvas.removeEventListener('mousemove', draw);
+        drawingCanvas.removeEventListener('mouseup', stopDrawing);
+        drawingCanvas.removeEventListener('mouseout', stopDrawing);
+        drawingCanvas.removeEventListener('touchstart', startDrawingTouch);
+        drawingCanvas.removeEventListener('touchmove', drawTouch);
+        drawingCanvas.removeEventListener('touchend', stopDrawing);
+    }
+}
+// --- End Drawing Canvas Functions ---
+
+// --- Coloring Page Functions ---
+function initializeColoringPageSelector() {
+    const selectorContainer = document.getElementById('coloring-page-selector');
+    const canvasArea = document.getElementById('coloring-page-canvas-area');
+    const paletteContainer = document.getElementById('coloring-palette-container');
+    const resetButton = document.getElementById('reset-coloring-button');
+
+
+    if (!selectorContainer || !canvasArea || !paletteContainer) return;
+
+    selectorContainer.innerHTML = `<p data-lang-key="coloringPageChoose">${translations[currentLanguage]?.coloringPageChoose || "Choose an image to color:"}</p>`;
+    
+    const thumbsContainer = document.createElement('div');
+    thumbsContainer.className = 'coloring-thumbs-grid';
+    coloringPagesData.forEach(page => {
+        const thumbButton = document.createElement('button');
+        thumbButton.className = 'coloring-page-thumb';
+        thumbButton.innerHTML = `<i class="fas fa-image"></i> <span data-lang-key="${page.nameKey}">${translations[currentLanguage]?.[page.nameKey] || page.id}</span>`;
+        thumbButton.onclick = () => loadColoringPage(page);
+        thumbsContainer.appendChild(thumbButton);
+    });
+    selectorContainer.appendChild(thumbsContainer);
+
+    selectorContainer.style.display = 'block';
+    canvasArea.style.display = 'none';
+    paletteContainer.style.display = 'none';
+    if(resetButton) resetButton.style.display = 'none';
+}
+
+function loadColoringPage(pageData) {
+    const selectorContainer = document.getElementById('coloring-page-selector');
+    const canvasArea = document.getElementById('coloring-page-canvas-area');
+    const paletteContainer = document.getElementById('coloring-palette-container');
+    const resetButton = document.getElementById('reset-coloring-button');
+
+    selectorContainer.style.display = 'none';
+    canvasArea.style.display = 'block'; 
+    paletteContainer.style.display = 'flex'; 
+    if(resetButton) resetButton.style.display = 'inline-block';
+
+    canvasArea.innerHTML = `<p class="loading-message" data-lang-key="coloringPageLoading">${translations[currentLanguage]?.coloringPageLoading || "Loading"} "<span data-lang-key="${pageData.nameKey}">${translations[currentLanguage]?.[pageData.nameKey] || pageData.id}</span>"...</p>`;
+
+    fetch(`./images/${pageData.svgFile}`) // Assumes SVGs are in an 'images' folder
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Network response was not ok for ${pageData.svgFile}: ${response.statusText}`);
+            }
+            return response.text();
+        })
+        .then(svgText => {
+            canvasArea.innerHTML = svgText;
+            selectedColoringPageSVGElement = canvasArea.querySelector('svg');
+            if (selectedColoringPageSVGElement) {
+                setupSVGColoringListeners(selectedColoringPageSVGElement);
+            } else {
+                canvasArea.innerHTML = `<p class="error-message">Error: Could not parse SVG.</p>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching or parsing SVG:', error);
+            canvasArea.innerHTML = `<p class="error-message">Error loading coloring page: ${pageData.nameKey}. Please check if the file exists in the 'images' folder.</p>`;
+        });
+    
+    const colors = ['#FF6347', '#FFD700', '#ADFF2F', '#00FFFF', '#4169E1', '#EE82EE', 
+                    '#FA8072', '#F0E68C', '#90EE90', '#ADD8E6', '#DDA0DD', '#FFB6C1',
+                    '#FFFFFF', '#A9A9A9', '#000000', '#8B4513'];
+    paletteContainer.innerHTML = ''; 
+    colors.forEach((color, index) => {
+        const colorButton = document.createElement('button');
+        colorButton.className = 'color-palette-button';
+        colorButton.style.backgroundColor = color;
+        colorButton.dataset.color = color;
+        colorButton.setAttribute('aria-label', `Select color ${color}`);
+        if (index === 0) { // Make the first color active by default
+            colorButton.classList.add('active');
+            currentColorForColoring = color;
+        }
+        colorButton.onclick = (e) => {
+            paletteContainer.querySelectorAll('.color-palette-button').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            currentColorForColoring = e.target.dataset.color;
+        };
+        paletteContainer.appendChild(colorButton);
+    });
+
+    if(resetButton) {
+        resetButton.onclick = () => {
+            if (selectedColoringPageSVGElement) {
+                const paths = selectedColoringPageSVGElement.querySelectorAll('path, circle, rect, ellipse, polygon, line'); // Common SVG shapes
+                paths.forEach(p => {
+                    // Only reset fill if it's not 'none' or transparent (to preserve unfillable areas or outlines)
+                    const currentFill = p.getAttribute('fill');
+                    if (currentFill && currentFill.toLowerCase() !== 'none' && currentFill.toLowerCase() !== 'transparent') {
+                        p.style.fill = ''; // Reset to original or remove inline style
+                        // If SVGs have default fills, you might need a more complex reset
+                        // For now, this clears inline fills applied by the user.
+                    }
+                });
+                showFeedbackMessage(translations[currentLanguage]?.colorsReset || "Colors reset.", "info");
+            }
+        }
+    }
+}
+
+function setupSVGColoringListeners(svgElement) {
+    if (!svgElement) return;
+    const paths = svgElement.querySelectorAll('path, circle, rect, ellipse, polygon, line'); // Target common SVG shapes
+    paths.forEach(path => {
+        // Add a class to style interactable paths if needed (e.g., hover)
+        // path.classList.add('colorable-path'); 
+        path.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event from bubbling up to parent if needed
+            const targetPath = e.currentTarget;
+            // Check if it's an element that should be filled (e.g., not a stroke-only line if you want to preserve those)
+            // This simple version fills any clicked path.
+            // You might need more complex logic based on your SVG structure (e.g., ignore paths with fill="none")
+            const currentFill = targetPath.getAttribute('fill');
+            if (currentFill && currentFill.toLowerCase() === 'none') {
+                // Don't color paths that are explicitly set to no fill (often used for invisible hit areas or complex structures)
+                return;
+            }
+            targetPath.style.fill = currentColorForColoring;
+        });
+    });
 }
